@@ -16,19 +16,18 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Data
 @Builder
-@Component
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    Order order;
+    private  Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    Product product;
+    private  Product product;
 
     @Column(name = "product_name", nullable = false, length = 255)
     private String productName; // Название на момент покупки
@@ -43,7 +42,7 @@ public class OrderItem {
     private String productArticle; // Артикул на момент покупки
 
 
-    public BigDecimal price() {
+    public BigDecimal getPrice() {
         if (productPrice == null || quantity == null) {
             return BigDecimal.ZERO;
         }

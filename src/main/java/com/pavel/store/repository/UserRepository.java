@@ -18,7 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u left join fetch u.orders")
     Page<User> findAllUsers(Pageable pageable);
 
-
     Optional<User> findById(Long id);
 
 

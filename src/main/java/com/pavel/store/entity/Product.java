@@ -3,9 +3,18 @@ package com.pavel.store.entity;
 
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -18,37 +27,42 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Table(name = "products")
-@Component
+@EntityListeners(AuditingEntityListener.class)
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    @Column(name = "product_name", nullable = false)
-    String name;
+    @NotNull
+    private String name;
 
     @Column(name = "product_price", precision = 10, scale = 2)
-    BigDecimal price;
+    @DecimalMin(value = "0.0", inclusive = false)
+    private BigDecimal price;
 
     @Column(name = "product_description")
-    String description;
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    Category category;
+    private Category category;
 
     @Column(name = "product_article", unique = true, nullable = false)
-    String article;
+    private String article;
 
     @Column(name = "product_amount")
-    Integer amount;
+    @Min(0)
+    private Integer amount;
 
-    @Column(name = "date_creation")
-    @CreationTimestamp
-    LocalDate dateOfCreation;
+    private String imageUrl;
 
-    @Column(name = "changing_quantity")
-    LocalDateTime changingTheQuantity;
+
+    @CreatedDate // ← Будет работать только с @EnableJpaAuditing
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate // ← Будет работать только с @EnableJpaAuditing
+    private LocalDateTime updatedAt;
 
 }

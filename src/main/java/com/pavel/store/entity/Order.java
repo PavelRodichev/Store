@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Data
-@Component
 public class Order {
 
     @Id()
@@ -32,17 +33,23 @@ public class Order {
     @Column(name = "total_amount")
     BigDecimal totalAmount;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     List<OrderItem> items = new ArrayList<>();
+
+    String address;
 
     @Enumerated(EnumType.STRING)
     OrderStatus orderStatus;
 
+    @CreatedDate
+    LocalDateTime orderDate;
+
 
     public void setTotalAmount() {
         for (OrderItem item : items) {
-            totalAmount = totalAmount.add(item.price());
+            totalAmount = totalAmount.add(item.getPrice());
         }
     }
+
 }

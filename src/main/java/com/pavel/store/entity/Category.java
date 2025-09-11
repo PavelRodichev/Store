@@ -16,7 +16,6 @@ import java.util.List;
 @Builder
 @Table(name = "categories")
 @Entity
-@Component
 public class Category {
 
 
@@ -29,4 +28,5 @@ public class Category {
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     List<Product> products = new ArrayList<>();
+
 }
