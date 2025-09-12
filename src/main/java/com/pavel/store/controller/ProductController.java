@@ -23,8 +23,8 @@ public class ProductController {
 
 
     @GetMapping
-    public ResponseEntity<Page<ProductResponseDto>> getAllProduct(@RequestParam  int page,
-                                                                  @RequestParam int size,
+    public ResponseEntity<Page<ProductResponseDto>> getAllProduct(@RequestParam(defaultValue = "0")  int page,
+                                                                  @RequestParam(defaultValue = "10") int size,
                                                                   @RequestParam(defaultValue = "name") String sort) {
         var sortBy = Sort.by(sort);
         Pageable pageable = PageRequest.of(page, size, sortBy);

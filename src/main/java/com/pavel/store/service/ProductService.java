@@ -2,11 +2,13 @@ package com.pavel.store.service;
 
 
 import com.pavel.store.dto.request.ProductCreateDto;
+import com.pavel.store.dto.request.ProductUpdateDto;
 import com.pavel.store.dto.response.ProductResponseDto;
 import com.pavel.store.entity.Product;
 import com.pavel.store.mapper.implMapper.ProductMapperImpl;
+import com.pavel.store.mapper.implMapper.UserMapperImpl;
 import com.pavel.store.repository.ProductRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.pavel.store.controller.handler.exeption.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +31,7 @@ public class ProductService {
 
 
     public ProductResponseDto getProductById(Long id) {
-        return productRepository.findById(id).map(productMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        return productRepository.findById(id).map(productMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Product", id));
     }
 
 
@@ -40,13 +42,19 @@ public class ProductService {
     @Transactional
     public Product saveProduct(ProductCreateDto productDto) {
         Product product = productMapper.toEntity(productDto);
-        return productRepository.save(product);
+        return productRepository.saveAndFlush(product);
     }
 
     @Transactional
     public void deleteProductById(Long id) {
-       productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product with that id not found"));
+        productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product", id));
         productRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void updateProduct(ProductUpdateDto updateDto, Long id) {
+        var product = productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product", id));
+        productMapper.updateEntity(updateDto, product);
     }
 
 }

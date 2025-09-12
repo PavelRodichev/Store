@@ -52,7 +52,7 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Order> orders = new ArrayList<>();
 
     @CreatedDate // ← Будет работать только с @EnableJpaAuditing

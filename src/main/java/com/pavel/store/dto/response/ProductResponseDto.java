@@ -9,9 +9,8 @@ import java.time.LocalDateTime;
 
 
 @Builder
-@Value
+@Data
 public class ProductResponseDto {
-
 
     Long id;
 

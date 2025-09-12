@@ -44,6 +44,12 @@ public class UserMapperImpl implements UserMapper {
 
     @Override
     public void updateEntity(UserUpdateDto updateDto, User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        user.setEmail(updateDto.getEmail());
+        user.setFirstName(updateDto.getFirstName());
+        user.setLastName(user.getLastName());
 
     }
 }

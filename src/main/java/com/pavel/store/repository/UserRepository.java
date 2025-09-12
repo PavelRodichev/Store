@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -15,13 +14,12 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
 
-    @Query("select u from User u left join fetch u.orders")
-    Page<User> findAllUsers(Pageable pageable);
+    Page<User> findAll(Pageable pageable);
 
     Optional<User> findById(Long id);
 
 
-    List<User> findAllByUsername(String username);
+    Optional<User> findByUsername(String username);
 
 
 }

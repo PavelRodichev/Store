@@ -1,15 +1,22 @@
 package com.pavel.store.mapper.implMapper;
 
 import com.pavel.store.dto.request.ProductCreateDto;
+import com.pavel.store.dto.request.ProductUpdateDto;
 import com.pavel.store.dto.response.ProductResponseDto;
 import com.pavel.store.entity.Product;
-import com.pavel.store.entity.User;
 import com.pavel.store.mapper.mapers.ProductMapper;
+import com.pavel.store.repository.CategoryRepository;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ProductMapperImpl implements ProductMapper {
 
+
+    private final CategoryRepository categoryRepository;
 
     @Override
     public ProductResponseDto toDto(Product product) {
@@ -48,7 +55,18 @@ public class ProductMapperImpl implements ProductMapper {
     }
 
     @Override
-    public void updateEntity(ProductCreateDto productCreateDto, Product product) {
+    public void updateEntity(ProductUpdateDto UpdateDto, Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException("ProductDto is null");
+        }
+
+        product.setName(UpdateDto.getName());
+        product.setArticle(UpdateDto.getArticle());
+        product.setPrice(UpdateDto.getPrice());
+        product.setImageUrl(UpdateDto.getImageUrl());
+        product.setCategory(categoryRepository.findByName(UpdateDto.getName()));
+        product.setDescription(UpdateDto.getDescription());
+        product.setAmount(UpdateDto.getAmount());
 
     }
 
