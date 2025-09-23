@@ -32,9 +32,8 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public Category getAllByName(String name) {
-
-        return categoryRepository.findByName(name);
+    public CategoryResponseDto getAllByName(String name) {
+        return categoryRepository.findByName(name).map(categoryMapper::toDto).orElseThrow(() -> new EntityNotFoundException(name));
     }
 
 

@@ -1,8 +1,10 @@
 package com.pavel.store.mapper.implMapper;
 
+import com.pavel.store.controller.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.ProductCreateDto;
 import com.pavel.store.dto.request.ProductUpdateDto;
 import com.pavel.store.dto.response.ProductResponseDto;
+import com.pavel.store.entity.Category;
 import com.pavel.store.entity.Product;
 import com.pavel.store.mapper.mapers.ProductMapper;
 import com.pavel.store.repository.CategoryRepository;
@@ -60,11 +62,13 @@ public class ProductMapperImpl implements ProductMapper {
             throw new IllegalArgumentException("ProductDto is null");
         }
 
+        Category category = categoryRepository.findByName(UpdateDto.getName()).orElseThrow(() -> new EntityNotFoundException("Category"));
+
         product.setName(UpdateDto.getName());
         product.setArticle(UpdateDto.getArticle());
         product.setPrice(UpdateDto.getPrice());
         product.setImageUrl(UpdateDto.getImageUrl());
-        product.setCategory(categoryRepository.findByName(UpdateDto.getName()));
+        product.setCategory(category);
         product.setDescription(UpdateDto.getDescription());
         product.setAmount(UpdateDto.getAmount());
 

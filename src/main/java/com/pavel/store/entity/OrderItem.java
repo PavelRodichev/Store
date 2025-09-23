@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class OrderItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
