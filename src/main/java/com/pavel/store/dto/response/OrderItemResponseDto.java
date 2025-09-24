@@ -18,7 +18,7 @@ public class OrderItemResponseDto {
 
     private String productName;
 
-    private BigDecimal totalPrice;
+    private BigDecimal productPrice;
 
     private Integer quantity;
 

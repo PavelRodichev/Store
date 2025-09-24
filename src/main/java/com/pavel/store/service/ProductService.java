@@ -34,6 +34,9 @@ public class ProductService {
         return productRepository.findById(id).map(productMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Product", id));
     }
 
+    public Product findProductById(Long id) {
+        return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product", id));
+    }
 
     public ProductResponseDto getProductByName(String name) {
         return productRepository.findByName(name).map(productMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Product not found"));

@@ -38,6 +38,11 @@ public class UserService {
                 orElseThrow(() -> new EntityNotFoundException("User", id));
     }
 
+    @Transactional
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User", id));
+    }
+
     @Transactional(readOnly = true)
     public UserResponseDto getUserByUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
@@ -57,8 +62,8 @@ public class UserService {
     public void deleteUserById(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-        }else {
-          throw  new  EntityNotFoundException("User", id);
+        } else {
+            throw new EntityNotFoundException("User", id);
         }
     }
 

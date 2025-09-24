@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class Order {
 
     @Id()
@@ -31,7 +33,7 @@ public class Order {
     User user;
 
     @Column(name = "total_amount")
-    BigDecimal totalAmount;
+    BigDecimal totalAmount = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -43,13 +45,20 @@ public class Order {
     OrderStatus orderStatus;
 
     @CreatedDate
+    @Column(name = "order_date")
     LocalDateTime orderDate;
 
 
-    public void setTotalAmount() {
-        for (OrderItem item : items) {
-            totalAmount = totalAmount.add(item.getPrice());
+    public void calculateTotalAmount() {
+        this.totalAmount = BigDecimal.ZERO; // Всегда сбрасываем в ноль
+
+        if (this.items != null) {
+            for (OrderItem item : this.items) {
+                if (item != null && item.getProductPrice() != null && item.getQuantity() != null) {
+                    BigDecimal itemTotal = item.getProductPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+                    this.totalAmount = this.totalAmount.add(itemTotal);
+                }
+            }
         }
     }
-
 }

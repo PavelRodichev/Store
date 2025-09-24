@@ -24,31 +24,23 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    private  Order order;
+    private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    private  Product product;
+    private Product product;
 
     @Column(name = "product_name", nullable = false, length = 255)
     private String productName; // Название на момент покупки
 
     @Column(name = "product_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal productPrice; // Цена на момент покупки
+    private BigDecimal productPrice = BigDecimal.ZERO; // Цена на момент покупки
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity; // Количество купленного товара
 
     @Column(name = "product_article", length = 100)
     private String productArticle; // Артикул на момент покупки
-
-
-    public BigDecimal getPrice() {
-        if (productPrice == null || quantity == null) {
-            return BigDecimal.ZERO;
-        }
-        return productPrice.multiply(BigDecimal.valueOf(quantity));
-    }
 
 
 }
