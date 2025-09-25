@@ -6,9 +6,8 @@ import com.pavel.store.dto.request.ProductUpdateDto;
 import com.pavel.store.dto.response.ProductResponseDto;
 import com.pavel.store.entity.Product;
 import com.pavel.store.mapper.implMapper.ProductMapperImpl;
-import com.pavel.store.mapper.implMapper.UserMapperImpl;
 import com.pavel.store.repository.ProductRepository;
-import com.pavel.store.controller.handler.exeption.EntityNotFoundException;
+import com.pavel.store.handler.exeption.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,9 +42,9 @@ public class ProductService {
     }
 
     @Transactional
-    public Product saveProduct(ProductCreateDto productDto) {
+    public ProductResponseDto saveProduct(ProductCreateDto productDto) {
         Product product = productMapper.toEntity(productDto);
-        return productRepository.saveAndFlush(product);
+        return productMapper.toDto(productRepository.save(product));
     }
 
     @Transactional
@@ -59,9 +58,12 @@ public class ProductService {
     }
 
     @Transactional
-    public void updateProduct(ProductUpdateDto updateDto, Long id) {
+    public ProductResponseDto updateProduct(ProductUpdateDto updateDto, Long id) {
         var product = productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product", id));
         productMapper.updateEntity(updateDto, product);
+
+
+        return productMapper.toDto(product);
     }
 
 }

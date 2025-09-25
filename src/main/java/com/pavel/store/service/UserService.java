@@ -1,7 +1,7 @@
 package com.pavel.store.service;
 
 
-import com.pavel.store.controller.handler.exeption.EntityNotFoundException;
+import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.UserRegistrationDto;
 import com.pavel.store.dto.request.UserUpdateDto;
 import com.pavel.store.dto.response.UserResponseDto;
@@ -9,7 +9,9 @@ import com.pavel.store.entity.Role;
 import com.pavel.store.entity.User;
 import com.pavel.store.mapper.implMapper.UserMapperImpl;
 import com.pavel.store.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -24,6 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final UserMapperImpl userMapper;
+
 
     @Transactional(readOnly = true)
     public Page<UserResponseDto> getAllUsers(Pageable pageable) {
@@ -51,11 +55,11 @@ public class UserService {
     }
 
     @Transactional
-    public UserRegistrationDto createUser(UserRegistrationDto userRegistrationDto) {
+    public UserResponseDto createUser(UserRegistrationDto userRegistrationDto) {
         User userSave = userMapper.toEntity(userRegistrationDto);
         userSave.setRole(Role.USER);
-        userRepository.saveAndFlush(userSave);
-        return userRegistrationDto;
+        log.info("User updated");
+        return userMapper.toDto(userRepository.saveAndFlush(userSave));
     }
 
     @Transactional
@@ -68,8 +72,10 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(UserUpdateDto updateDto, Long id) {
+    public UserResponseDto updateUser(UserUpdateDto updateDto, Long id) {
         var user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User", id));
         userMapper.updateEntity(updateDto, user);
+        return userMapper.toDto(user);
+
     }
 }

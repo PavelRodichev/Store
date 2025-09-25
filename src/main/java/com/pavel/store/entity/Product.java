@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 @Builder
 @Table(name = "products")
 @EntityListeners(AuditingEntityListener.class)
+@ToString(exclude = {"category"})
 public class Product {
 
     @Id

@@ -1,11 +1,9 @@
 package com.pavel.store.service;
 
-import com.pavel.store.controller.handler.exeption.EntityNotFoundException;
+import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.OrderCreateDto;
 import com.pavel.store.dto.request.OrderItemRequestDto;
 import com.pavel.store.dto.response.OrderResponseDto;
-import com.pavel.store.dto.response.ProductResponseDto;
-import com.pavel.store.dto.response.UserResponseDto;
 import com.pavel.store.entity.*;
 import com.pavel.store.mapper.mapers.OrderItemMapper;
 import com.pavel.store.mapper.mapers.OrderMapper;

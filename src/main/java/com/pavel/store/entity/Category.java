@@ -1,10 +1,7 @@
 package com.pavel.store.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -16,6 +13,7 @@ import java.util.List;
 @Builder
 @Table(name = "categories")
 @Entity
+@ToString(exclude = {"products"})
 public class Category {
 
 

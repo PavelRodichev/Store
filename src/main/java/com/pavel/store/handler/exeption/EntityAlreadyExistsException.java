@@ -1,6 +1,6 @@
-package com.pavel.store.controller.handler.exeption;
+package com.pavel.store.handler.exeption;
 
-import com.pavel.store.controller.handler.AppHandler;
+import com.pavel.store.handler.AppHandler;
 import org.springframework.http.HttpStatus;
 
 public class EntityAlreadyExistsException extends AppHandler {

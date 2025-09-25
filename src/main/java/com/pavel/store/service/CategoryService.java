@@ -1,6 +1,6 @@
 package com.pavel.store.service;
 
-import com.pavel.store.controller.handler.exeption.EntityNotFoundException;
+import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.response.CategoryResponseDto;
 import com.pavel.store.entity.Category;
 import com.pavel.store.mapper.mapers.CategoryMapper;

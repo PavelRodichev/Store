@@ -7,6 +7,8 @@ import com.pavel.store.entity.User;
 import com.pavel.store.mapper.mapers.UserMapper;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class UserMapperImpl implements UserMapper {
 
@@ -47,9 +49,17 @@ public class UserMapperImpl implements UserMapper {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
-        user.setEmail(updateDto.getEmail());
-        user.setFirstName(updateDto.getFirstName());
-        user.setLastName(user.getLastName());
+        if (updateDto.getFirstName() != null) {
+            user.setFirstName(updateDto.getFirstName());
+        }
+        if (updateDto.getEmail() != null) {
+            user.setEmail(updateDto.getEmail());
+        }
+        if (updateDto.getLastName() != null) {
+            user.setLastName(updateDto.getLastName());
+        }
+        // Обновляем timestamp
+        user.setUpdatedAt(LocalDateTime.now());
 
     }
 }

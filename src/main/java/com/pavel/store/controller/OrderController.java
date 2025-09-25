@@ -3,6 +3,7 @@ package com.pavel.store.controller;
 import com.pavel.store.dto.request.OrderCreateDto;
 import com.pavel.store.dto.response.OrderResponseDto;
 import com.pavel.store.service.OrderService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/orders")
 @Slf4j
+@Tag(name = "Order API", description = "Операции с заказами")
 public class OrderController {
 
     private final OrderService orderService;

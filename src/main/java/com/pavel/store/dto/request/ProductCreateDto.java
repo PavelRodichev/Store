@@ -18,8 +18,6 @@ import java.time.LocalDateTime;
 @Builder
 public class ProductCreateDto {
 
-    private Long id;
-
     @NotBlank(message = "Product name is required")
     @Size(min = 2, max = 100, message = "Product name must be between 2 and 100 characters")
     private String name;

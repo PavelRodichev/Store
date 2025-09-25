@@ -1,4 +1,4 @@
-package com.pavel.store.controller.handler;
+package com.pavel.store.handler;
 
 import org.springframework.http.HttpStatus;
 

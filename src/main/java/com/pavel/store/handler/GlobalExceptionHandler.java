@@ -1,14 +1,14 @@
-package com.pavel.store.controller.handler;
+package com.pavel.store.handler;
 
-import com.pavel.store.controller.handler.exeption.EntityAlreadyExistsException;
-import com.pavel.store.controller.handler.exeption.EntityNotFoundException;
+import com.pavel.store.handler.exeption.EntityAlreadyExistsException;
+import com.pavel.store.handler.exeption.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.pavel.store.controller")
 public class GlobalExceptionHandler {
 
 
@@ -31,5 +31,12 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorDetails, ex.getHttpStatus());
 
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception e) {
+        e.printStackTrace(); // Смотрите логи в консоли!
+        return ResponseEntity.status(500)
+                .body("Error: " + e.getMessage() + "\nCheck console for details");
     }
 }

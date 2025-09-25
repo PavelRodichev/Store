@@ -1,6 +1,6 @@
 package com.pavel.store.mapper.implMapper;
 
-import com.pavel.store.controller.handler.exeption.EntityNotFoundException;
+import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.ProductCreateDto;
 import com.pavel.store.dto.request.ProductUpdateDto;
 import com.pavel.store.dto.response.ProductResponseDto;
@@ -8,8 +8,6 @@ import com.pavel.store.entity.Category;
 import com.pavel.store.entity.Product;
 import com.pavel.store.mapper.mapers.ProductMapper;
 import com.pavel.store.repository.CategoryRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -44,15 +42,15 @@ public class ProductMapperImpl implements ProductMapper {
         if (productCreateDto == null) {
             throw new IllegalArgumentException("ProductDto is null");
         }
-
+        Category category = categoryRepository.findByName(productCreateDto.getCategoryName()).orElseThrow(() -> new EntityNotFoundException("Product"));
         return Product.builder()
-                .id(productCreateDto.getId())
                 .name(productCreateDto.getName())
                 .price(productCreateDto.getPrice())
                 .description(productCreateDto.getDescription())
                 .amount(productCreateDto.getAmount())
                 .article(productCreateDto.getArticle())
                 .imageUrl(productCreateDto.getImageUrl())
+                .category(category)
                 .build();
     }
 
@@ -62,7 +60,14 @@ public class ProductMapperImpl implements ProductMapper {
             throw new IllegalArgumentException("ProductDto is null");
         }
 
-        Category category = categoryRepository.findByName(UpdateDto.getName()).orElseThrow(() -> new EntityNotFoundException("Category"));
+        System.out.println();
+
+        Category category = categoryRepository
+                .findByName(UpdateDto.getCategoryName())
+                .orElseThrow(() -> new EntityNotFoundException("Category"));
+
+
+        System.out.println();
 
         product.setName(UpdateDto.getName());
         product.setArticle(UpdateDto.getArticle());
@@ -71,6 +76,7 @@ public class ProductMapperImpl implements ProductMapper {
         product.setCategory(category);
         product.setDescription(UpdateDto.getDescription());
         product.setAmount(UpdateDto.getAmount());
+
 
     }
 
