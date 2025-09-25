@@ -1,5 +1,6 @@
 package com.pavel.store.controller;
 
+import com.pavel.store.dto.request.CategoryRequestDto;
 import com.pavel.store.dto.response.CategoryResponseDto;
 import com.pavel.store.service.CategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,10 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -29,7 +27,28 @@ public class CategoryController {
         var sortBy = Sort.by(sort);
         Pageable pageable = PageRequest.of(page, size, sortBy);
         return ResponseEntity.ok(categoryService.getAll(pageable));
+    }
 
+    @GetMapping("/{name}")
+    public ResponseEntity<CategoryResponseDto> getCategoryByName(@PathVariable String name) {
+        return ResponseEntity.ok(categoryService.getByName(name));
+    }
+
+    @PostMapping
+    public ResponseEntity<CategoryResponseDto> createCategory(@RequestBody CategoryRequestDto categoryRequestDto) {
+
+        return ResponseEntity.ok(categoryService.save(categoryRequestDto));
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable Long id) {
+        categoryService.deleteById(id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponseDto> updateCategory(@RequestBody CategoryRequestDto categoryRequestDto, @PathVariable Long id) {
+
+        return ResponseEntity.ok(categoryService.update(categoryRequestDto, id));
 
     }
 

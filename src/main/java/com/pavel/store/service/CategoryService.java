@@ -1,5 +1,6 @@
 package com.pavel.store.service;
 
+import com.pavel.store.dto.request.CategoryRequestDto;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.response.CategoryResponseDto;
 import com.pavel.store.entity.Category;
@@ -32,14 +33,15 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public CategoryResponseDto getAllByName(String name) {
+    public CategoryResponseDto getByName(String name) {
         return categoryRepository.findByName(name).map(categoryMapper::toDto).orElseThrow(() -> new EntityNotFoundException(name));
     }
 
 
     @Transactional
-    public Category save(Category category) {
-        return categoryRepository.save(category);
+    public CategoryResponseDto save(CategoryRequestDto category) {
+        Category save = categoryMapper.toEntity(category);
+        return categoryMapper.toDto(categoryRepository.save(save));
     }
 
     @Transactional
@@ -47,4 +49,13 @@ public class CategoryService {
         categoryRepository.deleteById(id);
     }
 
+    @Transactional
+    public CategoryResponseDto update(CategoryRequestDto categoryRequestDto, Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Category", id));
+
+        categoryMapper.updateEntity(categoryRequestDto, category);
+
+        return categoryMapper.toDto(category);
+    }
 }
