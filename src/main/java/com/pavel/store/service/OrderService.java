@@ -1,5 +1,6 @@
 package com.pavel.store.service;
 
+import com.pavel.store.dto.request.OrderUpdateDto;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.OrderCreateDto;
 import com.pavel.store.dto.request.OrderItemRequestDto;
@@ -79,4 +80,26 @@ public class OrderService {
         return orderResponseDto;
     }
 
+    @Transactional(readOnly = true)
+    public OrderResponseDto findOrderByUserId(Long userId) {
+
+        return orderRepository.findByUser_Id(userId).map(orderMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Order"));
+    }
+
+    @Transactional
+    public void deleteById(Long id) {
+        if (orderRepository.existsById(id)) {
+            orderRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("Order", id);
+        }
+    }
+
+    @Transactional
+    public OrderResponseDto updateOrderById(OrderUpdateDto orderUpdateDto, Long id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Order", id));
+        order.setAddress(orderUpdateDto.getShippingAddress());
+        order.setOrderStatus(OrderStatus.valueOf(orderUpdateDto.getStatus()));
+        return orderMapper.toDto(order);
+    }
 }

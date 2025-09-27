@@ -9,10 +9,15 @@ import com.pavel.store.mapper.implMapper.ProductMapperImpl;
 import com.pavel.store.repository.ProductRepository;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +26,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapperImpl productMapper;
-
+    private final ImageService imageService;
 
     public Page<ProductResponseDto> getAllProduct(Pageable pageable) {
         Page<Product> productPage = productRepository.findAll(pageable);
@@ -41,10 +46,31 @@ public class ProductService {
         return productRepository.findByName(name).map(productMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 
+    public Optional<byte[]> getImage(Long id) {
+        return productRepository.findById(id)
+                .map(Product::getImage)
+                .filter(StringUtils::hasText)
+                .flatMap(imageService::get);
+    }
+
     @Transactional
+
     public ProductResponseDto saveProduct(ProductCreateDto productDto) {
-        Product product = productMapper.toEntity(productDto);
-        return productMapper.toDto(productRepository.save(product));
+        return Optional.of(productDto).map(dto -> {
+            if (dto.getImage() != null) {
+                uploadImage(dto.getImage());
+            }
+            return productMapper.toEntity(productDto);
+        }).map(productRepository::save).map(productMapper::toDto).orElseThrow(() -> new RuntimeException("Product not created"));
+    }
+
+    @SneakyThrows
+    private void uploadImage(MultipartFile image) {
+        if (!image.isEmpty()) {
+            imageService.upload(image.getOriginalFilename(), image.getInputStream());
+        }
+
+
     }
 
     @Transactional
@@ -59,11 +85,15 @@ public class ProductService {
 
     @Transactional
     public ProductResponseDto updateProduct(ProductUpdateDto updateDto, Long id) {
-        var product = productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product", id));
-        productMapper.updateEntity(updateDto, product);
 
-
-        return productMapper.toDto(product);
+        return productRepository.findById(id)
+                .map(product -> {
+                    if (updateDto.getImage() != null) {
+                        uploadImage(updateDto.getImage());
+                    }
+                    productMapper.updateEntity(updateDto, product);
+                    return productRepository.save(product);
+                }).map(productMapper::toDto).orElseThrow();
     }
 
 }

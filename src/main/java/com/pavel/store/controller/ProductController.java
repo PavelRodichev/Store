@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -40,6 +41,11 @@ public class ProductController {
     public ResponseEntity<ProductResponseDto> getUserById(@PathVariable Long id) {
 
         return ResponseEntity.ok(productService.getProductById(id));
+    }
+
+    @GetMapping("/{id}/image")
+    private byte[] findImage(@PathVariable Long id) {
+        return productService.getImage(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
 

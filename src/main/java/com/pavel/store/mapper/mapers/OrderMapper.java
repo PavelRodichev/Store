@@ -6,6 +6,7 @@ import com.pavel.store.dto.response.OrderResponseDto;
 import com.pavel.store.entity.Order;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = "spring")
@@ -15,8 +16,8 @@ public interface OrderMapper {
 
     @Mapping(target = "username", source = "user.username")
     @Mapping(target = "items", source = "order.items")
-    @Mapping(target =  "orderStatus",source = "orderStatus")
-    @Mapping(target = "orderDate",source = "orderDate")
+    @Mapping(target = "orderStatus", source = "orderStatus")
+    @Mapping(target = "orderDate", source = "orderDate")
     OrderResponseDto toDto(Order order);
 
     Order toEntity(OrderCreateDto orderResponseDto);

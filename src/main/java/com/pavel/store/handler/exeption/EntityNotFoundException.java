@@ -11,7 +11,7 @@ public class EntityNotFoundException extends AppHandler {
     }
 
     public EntityNotFoundException(String name) {
-        super(String.format("Entity with field %s not found", name), HttpStatus.NOT_FOUND);
+        super(String.format("Entity %s not found", name), HttpStatus.NOT_FOUND);
     }
 
 }

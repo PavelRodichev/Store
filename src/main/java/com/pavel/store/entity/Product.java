@@ -56,7 +56,7 @@ public class Product {
     @Min(0)
     private Integer amount;
 
-    private String imageUrl;
+    private String image;
 
 
     @CreatedDate // ← Будет работать только с @EnableJpaAuditing

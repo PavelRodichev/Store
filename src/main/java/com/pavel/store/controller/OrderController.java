@@ -1,6 +1,7 @@
 package com.pavel.store.controller;
 
 import com.pavel.store.dto.request.OrderCreateDto;
+import com.pavel.store.dto.request.OrderUpdateDto;
 import com.pavel.store.dto.response.OrderResponseDto;
 import com.pavel.store.service.OrderService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,4 +49,27 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    @GetMapping("/order")
+    public ResponseEntity<?> getOrder(@RequestParam(required = false) Long orderId,
+                                      @RequestParam(required = false) Long userId) {
+
+        if (orderId != null) {
+            return ResponseEntity.ok(orderService.findOrderById(orderId));
+        } else if (userId != null) {
+            return ResponseEntity.ok(orderService.findOrderByUserId(userId));
+        } else
+            return ResponseEntity.badRequest().body("Either orderId or userId must be provided");
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    private void deleteById(@PathVariable Long id) {
+        orderService.deleteById(id);
+    }
+
+    @PutMapping("/{id}")
+    private ResponseEntity<OrderResponseDto> updateOrder(@RequestBody OrderUpdateDto orderUpdateDto, @PathVariable Long id) {
+
+        return ResponseEntity.ok(orderService.updateOrderById(orderUpdateDto, id));
+    }
 }

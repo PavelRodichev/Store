@@ -20,7 +20,7 @@ VALUES ('admin', 'admin@example.com', '$2a$10$Fak3Hash3xamp1e', 'Admin', 'User',
        ('alex_brown', 'alex.brown@example.com', '$2a$10$Fak3Hash3xamp1e', 'Alex', 'Brown', 'USER');
 
 -- changeset rodichev:3
-INSERT INTO products (name, product_article, product_description, product_price, product_amount, category_id, image_url) VALUES
+INSERT INTO products (name, product_article, product_description, product_price, product_amount, category_id, image) VALUES
 -- Electronics
 ('MacBook Pro 16"', 'MBP16-001', 'Apple MacBook Pro 16 inch with M2 Pro chip', 2499.99, 15, 1, '/images/macbook-pro.jpg'),
 ('iPhone 15 Pro', 'IP15P-002', 'Latest iPhone with advanced camera system', 999.99, 50, 1, '/images/iphone15.jpg'),

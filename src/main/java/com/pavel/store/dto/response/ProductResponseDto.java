@@ -1,8 +1,6 @@
 package com.pavel.store.dto.response;
 
-import jakarta.validation.constraints.*;
 import lombok.*;
-import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,7 +24,7 @@ public class ProductResponseDto {
 
     String article;
 
-    String imageUrl;
+    String image;
 
     LocalDateTime createdAt;
 

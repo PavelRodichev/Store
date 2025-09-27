@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.validator.constraints.URL;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -31,8 +32,6 @@ public class ProductUpdateDto {
     @Min(value = 1, message = "Amount cannot be negative")
     private Integer amount;
 
-    @URL(message = "Image URL must be valid")
-    @Size(max = 500, message = "Image URL cannot exceed 500 characters")
-    private String imageUrl;
+    private MultipartFile image;
 
 }

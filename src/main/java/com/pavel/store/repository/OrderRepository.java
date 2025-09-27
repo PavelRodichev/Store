@@ -2,6 +2,7 @@ package com.pavel.store.repository;
 
 import com.pavel.store.dto.request.OrderCreateDto;
 import com.pavel.store.entity.Order;
+import com.pavel.store.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,5 +27,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Order save(Order order);
 
+    Optional<Order> findByUser_Id(Long id);
 
 }
