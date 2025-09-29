@@ -1,6 +1,5 @@
 package com.pavel.store.handler.exeption;
 
-import com.pavel.store.handler.AppHandler;
 import org.springframework.http.HttpStatus;
 
 public class EntityNotFoundException extends AppHandler {

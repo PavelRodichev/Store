@@ -1,4 +1,4 @@
-package com.pavel.store.handler;
+package com.pavel.store.handler.exeption;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;

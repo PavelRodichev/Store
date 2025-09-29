@@ -36,7 +36,6 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProduct(pageable));
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getUserById(@PathVariable Long id) {
 

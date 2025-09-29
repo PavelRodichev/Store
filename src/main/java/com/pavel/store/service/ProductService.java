@@ -10,6 +10,7 @@ import com.pavel.store.repository.ProductRepository;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -96,4 +101,28 @@ public class ProductService {
                 }).map(productMapper::toDto).orElseThrow();
     }
 
+    @Transactional
+    public void increaseAllPrices(BigDecimal percent) {
+        log.info("Increasing all product prices by {}%", percent);
+        if (percent == null) {
+            throw new IllegalArgumentException("Percentage cannot be null");
+        }
+        List<Product> products = productRepository.findAll();
+
+        if (products.isEmpty()) {
+            log.info("No products found for price update");
+            return;
+        }
+        if (percent.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Percentage must be positive: " + percent);
+        }
+
+        BigDecimal multiplier = BigDecimal.ONE.add(percent.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
+
+        productRepository.updateAllPrices(multiplier);
+
+        log.info("the price of the products has been changed");
+
+
+    }
 }
