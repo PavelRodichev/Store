@@ -53,7 +53,7 @@ public class OrderService {
 
         Order saved = Order.builder()
                 .address(createDto.getShippingAddress())
-                .orderStatus(OrderStatus.PENDING)
+                .orderStatus(OrderStatus.CREATED)
                 .user(user)
                 .build();
 
@@ -73,7 +73,15 @@ public class OrderService {
                     .product(product)
                     .build();
 
+//проверяем кол-во продуктов
+            if (product.getAmount() > 0) {
+                product.setAmount(product.getAmount() - orderItem.getQuantity());
+            } else {
+                throw new IllegalArgumentException("the product quantity must be > 0");
+            }
+
             saved.getItems().add(orderItem);
+
         }
         saved.calculateTotalAmount();
         OrderResponseDto orderResponseDto = orderMapper.toDto(orderRepository.save(saved));

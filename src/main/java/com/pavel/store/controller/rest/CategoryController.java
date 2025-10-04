@@ -1,4 +1,4 @@
-package com.pavel.store.controller;
+package com.pavel.store.controller.rest;
 
 import com.pavel.store.dto.request.CategoryRequestDto;
 import com.pavel.store.dto.response.CategoryResponseDto;
