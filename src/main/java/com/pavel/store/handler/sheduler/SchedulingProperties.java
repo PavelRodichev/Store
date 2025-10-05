@@ -19,5 +19,4 @@ public class SchedulingProperties {
     @Pattern(regexp = "\\d+", message = "Period must be a number")
     private String period = "30000";
 
-
 }

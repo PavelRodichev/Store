@@ -14,6 +14,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,9 +40,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProduct(pageable));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> getUserById(@PathVariable Long id) {
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponseDto> getUserById(
+            @PathVariable Long id) {
+
+        System.out.println();
         return ResponseEntity.ok(productService.getProductById(id));
     }
 

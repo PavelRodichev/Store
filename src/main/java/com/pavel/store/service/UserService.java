@@ -1,6 +1,7 @@
 package com.pavel.store.service;
 
 
+import com.pavel.store.entity.CustomUserDetails;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.UserRegistrationDto;
 import com.pavel.store.dto.request.UserUpdateDto;
@@ -87,7 +88,8 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         return userRepository.findByUsername(username)
-                .map(user -> new org.springframework.security.core.userdetails.User(
+                .map(user -> new CustomUserDetails(
+                        user.getId(),
                         user.getUsername(),
                         user.getPassword(),
                         Collections.singleton(user.getRole()))
