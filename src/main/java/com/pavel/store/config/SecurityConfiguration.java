@@ -23,15 +23,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/v3/api-docs/", "/swagger-ui/").permitAll()
-                        .requestMatchers("/api/admin/products").hasRole(ADMIN.getAuthority())
-                        .anyRequest().authenticated()
-                )
-//                .httpBasic(Customizer.withDefaults()).
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/api/v1/products")
-                        .permitAll());
+                        .anyRequest().permitAll()
+                ).formLogin(Customizer.withDefaults());
 
         return http.build();
     }

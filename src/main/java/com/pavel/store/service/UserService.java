@@ -1,6 +1,7 @@
 package com.pavel.store.service;
 
 
+import com.pavel.store.aop.MethodTime;
 import com.pavel.store.entity.CustomUserDetails;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.UserRegistrationDto;
@@ -15,12 +16,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -59,6 +64,7 @@ public class UserService implements UserDetailsService {
         return user.map(userMapper::toDto).orElseThrow(() -> new EntityNotFoundException(username));
     }
 
+
     @Transactional
     public UserResponseDto createUser(UserRegistrationDto userRegistrationDto) {
         User userSave = userMapper.toEntity(userRegistrationDto);
@@ -84,16 +90,34 @@ public class UserService implements UserDetailsService {
 
     }
 
+    @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        return userRepository.findByUsername(username)
-                .map(user -> new CustomUserDetails(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getPassword(),
-                        Collections.singleton(user.getRole()))
-                ).orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user: " + username));
+        log.info("Loading user: {}", username);
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new UsernameNotFoundException("User not found: " + username);
+                });
+
+        // Преобразуем роли в authorities
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+
+        // Основная роль
+        authorities.add(new SimpleGrantedAuthority(user.getRole().getAuthority()));
+
+
+        log.info("User loaded: {}, authorities: {}", user.getUsername(), authorities);
+
+        return new CustomUserDetails(
+                user.getId(),
+                user.getUsername(),
+                user.getPassword(),
+                authorities
+        );
+
     }
 
 

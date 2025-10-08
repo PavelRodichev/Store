@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final OrderService orderService;
+
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderCreateDto request) {
@@ -47,6 +49,7 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+
     @GetMapping("/order")
     public ResponseEntity<?> getOrder(@RequestParam(required = false) Long orderId,
                                       @RequestParam(required = false) Long userId) {
@@ -59,15 +62,16 @@ public class OrderController {
             return ResponseEntity.badRequest().body("Either orderId or userId must be provided");
     }
 
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    private void deleteById(@PathVariable Long id) {
+    public void deleteById(@PathVariable Long id) {
         orderService.deleteById(id);
     }
 
 
     @PutMapping("/{id}")
-    private ResponseEntity<OrderResponseDto> updateOrder(@RequestBody OrderUpdateDto orderUpdateDto, @PathVariable Long id) {
+    public ResponseEntity<OrderResponseDto> updateOrder(@RequestBody OrderUpdateDto orderUpdateDto, @PathVariable Long id) {
 
         return ResponseEntity.ok(orderService.updateOrderById(orderUpdateDto, id));
     }

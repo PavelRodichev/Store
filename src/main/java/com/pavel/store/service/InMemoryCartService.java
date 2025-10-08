@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class InMemoryCartService {
     /**
      * Получить корзину пользователя
      */
+    @Transactional
     public CartDto getCart(Long userId) {
         log.debug("Getting cart for user: {}", userId);
 
@@ -66,6 +68,7 @@ public class InMemoryCartService {
     /**
      * Добавить товар в корзину
      */
+    @Transactional(readOnly = true)
     public CartDto addToCart(Long userId, Long productId, int quantity) {
         Map<Long, Integer> userCart = userCarts.computeIfAbsent(userId, k -> new HashMap<>());
 
@@ -83,6 +86,7 @@ public class InMemoryCartService {
     /**
      * Удалить товар из корзины
      */
+    @Transactional(readOnly = true)
     public CartDto removeFromCart(Long userId, Long productId) {
         Map<Long, Integer> userCart = userCarts.get(userId);
         if (userCart != null) {
@@ -94,6 +98,7 @@ public class InMemoryCartService {
     /**
      * Очистить корзину
      */
+    @Transactional(readOnly = true)
     @Scheduled(fixedRate = 3600000)
     public void clearCart() {
         userCarts.clear();

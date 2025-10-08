@@ -1,6 +1,7 @@
 package com.pavel.store.service;
 
 
+import com.pavel.store.aop.MethodTime;
 import com.pavel.store.dto.request.ProductCreateDto;
 import com.pavel.store.dto.request.ProductUpdateDto;
 import com.pavel.store.dto.response.ProductResponseDto;
@@ -26,31 +27,39 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapperImpl productMapper;
     private final ImageService imageService;
 
+
+    @MethodTime
+    @Transactional(readOnly = true)
     public Page<ProductResponseDto> getAllProduct(Pageable pageable) {
         Page<Product> productPage = productRepository.findAll(pageable);
         return productPage.map(productMapper::toDto);
     }
 
-
+    @MethodTime
+    @Transactional(readOnly = true)
     public ProductResponseDto getProductById(Long id) {
         return productRepository.findById(id).map(productMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Product", id));
     }
 
+    @MethodTime
+    @Transactional(readOnly = true)
     public Product findProductById(Long id) {
         return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product", id));
     }
 
+    @MethodTime
+    @Transactional(readOnly = true)
     public ProductResponseDto getProductByName(String name) {
         return productRepository.findByName(name).map(productMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 
+    @Transactional(readOnly = true)
     public Optional<byte[]> getImage(Long id) {
         return productRepository.findById(id)
                 .map(Product::getImage)
@@ -58,8 +67,8 @@ public class ProductService {
                 .flatMap(imageService::get);
     }
 
+    @MethodTime
     @Transactional
-
     public ProductResponseDto saveProduct(ProductCreateDto productDto) {
         return Optional.of(productDto).map(dto -> {
             if (dto.getImage() != null) {
@@ -122,7 +131,6 @@ public class ProductService {
         productRepository.updateAllPrices(multiplier);
 
         log.info("the price of the products has been changed");
-
 
     }
 }

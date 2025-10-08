@@ -9,11 +9,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -25,24 +28,30 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "get all users")
-    @GetMapping()
-    public ResponseEntity<?> getUsers(
-            @RequestParam(required = false) String username,
+
+    @Operation(summary = "Get all users with pagination")
+    @GetMapping
+    public ResponseEntity<Page<UserResponseDto>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "username") String sort
     ) {
-        if (username != null) {
-            // Вернуть одного пользователя
-            UserResponseDto user = userService.getUserByUsername(username);
-            return ResponseEntity.ok(user);
-        } else {
-            var sortBy = Sort.by(sort);
-            Pageable pageable = PageRequest.of(page, size, sortBy);
-            return ResponseEntity.ok(userService.getAllUsers(pageable));
-        }
+        Sort sortBy = Sort.by(sort);
+        Pageable pageable = PageRequest.of(page, size, sortBy);
+        Page<UserResponseDto> users = userService.getAllUsers(pageable);
+        return ResponseEntity.ok(users);
     }
+
+
+    @Operation(summary = "Get user by username")
+    @GetMapping("/username")
+    public ResponseEntity<UserResponseDto> getUserByUsername(
+            @RequestParam String username
+    ) {
+        UserResponseDto user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(user);
+    }
+
 
     @Operation(summary = "get User by id")
     @GetMapping("/{id}")
@@ -59,6 +68,7 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(user));
     }
 
+    @Transactional
     @Operation(summary = "delete user")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -66,6 +76,7 @@ public class UserController {
         userService.deleteUserById(id);
     }
 
+    @Transactional
     @PutMapping("/{id}")
     @Operation(summary = "delete user")
     public ResponseEntity<UserResponseDto> updateUser(@RequestBody @Valid UserUpdateDto updateDto, @PathVariable Long id) {

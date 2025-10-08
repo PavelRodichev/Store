@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+
     @GetMapping()
     public ResponseEntity<Page<CategoryResponseDto>> getAllCategory(@RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size,
@@ -30,10 +32,12 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAll(pageable));
     }
 
+
     @GetMapping("/{name}")
     public ResponseEntity<CategoryResponseDto> getCategoryByName(@PathVariable String name) {
         return ResponseEntity.ok(categoryService.getByName(name));
     }
+
 
     @PostMapping
     public ResponseEntity<CategoryResponseDto> createCategory(@RequestBody CategoryRequestDto categoryRequestDto) {
