@@ -33,7 +33,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<UserResponseDto>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "username") String sort
     ) {
         Sort sortBy = Sort.by(sort);

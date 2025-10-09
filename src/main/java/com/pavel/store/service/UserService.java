@@ -3,6 +3,7 @@ package com.pavel.store.service;
 
 import com.pavel.store.aop.MethodTime;
 import com.pavel.store.entity.CustomUserDetails;
+import com.pavel.store.handler.exeption.EntityAlreadyExistsException;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.UserRegistrationDto;
 import com.pavel.store.dto.request.UserUpdateDto;
@@ -67,9 +68,16 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserResponseDto createUser(UserRegistrationDto userRegistrationDto) {
+        if (userRepository.existsByEmail(userRegistrationDto.getEmail())) {
+            throw new EntityAlreadyExistsException("User", "email", userRegistrationDto.getEmail());
+        }
+        if (userRepository.existsUserByUsername(userRegistrationDto.getUsername())) {
+            throw new EntityAlreadyExistsException("User", "username", userRegistrationDto.getUsername());
+        }
+
         User userSave = userMapper.toEntity(userRegistrationDto);
         userSave.setRole(Role.USER);
-        log.info("User updated");
+        log.info("User created");
         return userMapper.toDto(userRepository.saveAndFlush(userSave));
     }
 

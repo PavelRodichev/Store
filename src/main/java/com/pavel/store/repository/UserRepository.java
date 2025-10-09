@@ -1,6 +1,7 @@
 package com.pavel.store.repository;
 
 import com.pavel.store.entity.User;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,5 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String mail);
 
     boolean existsByEmail(String mail);
+
+    boolean existsUserByUsername(@NotBlank(message = "Username is required") String username);
 
 }

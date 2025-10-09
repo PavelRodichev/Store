@@ -116,15 +116,15 @@ public class ProductService {
         if (percent == null) {
             throw new IllegalArgumentException("Percentage cannot be null");
         }
-        List<Product> products = productRepository.findAll();
-
-        if (products.isEmpty()) {
-            log.info("No products found for price update");
-            return;
-        }
         if (percent.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Percentage must be positive: " + percent);
         }
+        List<Product> products = productRepository.findAll();
+        if (products.isEmpty()) {
+            log.info("No products found for price update");
+           return;
+        }
+
 
         BigDecimal multiplier = BigDecimal.ONE.add(percent.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
 
