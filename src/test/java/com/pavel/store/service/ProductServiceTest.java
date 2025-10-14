@@ -369,7 +369,7 @@ public class ProductServiceTest {
         Product updatedProduct = createProduct(productId, "Updated Product", new BigDecimal("200.00"));
         ProductResponseDto expectedDto = createProductResponseDto(productId, "Updated Product", new BigDecimal("200.00"));
 
-        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        when(productRepository.findByIdForUpdate(productId)).thenReturn(Optional.of(existingProduct));
         doNothing().when(productMapper).updateEntity(updateDto, existingProduct);
         when(productRepository.save(existingProduct)).thenReturn(updatedProduct);
         when(productMapper.toDto(updatedProduct)).thenReturn(expectedDto);
@@ -379,7 +379,7 @@ public class ProductServiceTest {
 
         // Assert
         assertThat(result).isEqualTo(expectedDto);
-        verify(productRepository).findById(productId);
+        verify(productRepository).findByIdForUpdate(productId);
         verify(productMapper).updateEntity(updateDto, existingProduct);
         verify(productRepository).save(existingProduct);
         verify(productMapper).toDto(updatedProduct);
@@ -406,7 +406,7 @@ public class ProductServiceTest {
         when(image.isEmpty()).thenReturn(false);
         when(image.getOriginalFilename()).thenReturn("updated.jpg");
         when(image.getInputStream()).thenReturn(new ByteArrayInputStream("image data".getBytes()));
-        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        when(productRepository.findByIdForUpdate(productId)).thenReturn(Optional.of(existingProduct));
         doNothing().when(productMapper).updateEntity(updateDto, existingProduct);
         when(productRepository.save(existingProduct)).thenReturn(updatedProduct);
         when(productMapper.toDto(updatedProduct)).thenReturn(expectedDto);

@@ -27,7 +27,7 @@ public class MethodTimeAspect {
             return result;
         } catch (Throwable ex) {
             long executionTime = System.currentTimeMillis() - start;
-            log.error("error when using the method{} in class {},operating time is: {} ms", methodName, className, executionTime);
+            log.error("error when using the method {} in class {},operating time is: {} ms", methodName, className, executionTime);
             throw ex;
         } finally {
             if (success) {

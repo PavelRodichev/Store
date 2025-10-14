@@ -74,7 +74,7 @@ public class OrderService {
                     .build();
 
 //проверяем кол-во продуктов
-            if (product.getAmount() > 0) {
+            if (product.getAmount() > 0 && product.getAmount() >= orderItem.getQuantity()) {
                 product.setAmount(product.getAmount() - orderItem.getQuantity());
             } else {
                 throw new IllegalArgumentException("the product quantity must be > 0");
@@ -84,7 +84,8 @@ public class OrderService {
 
         }
         saved.calculateTotalAmount();
-        OrderResponseDto orderResponseDto = orderMapper.toDto(orderRepository.save(saved));
+        Order savedOrder = orderRepository.save(saved);
+        OrderResponseDto orderResponseDto = orderMapper.toDto(savedOrder);
         return orderResponseDto;
     }
 

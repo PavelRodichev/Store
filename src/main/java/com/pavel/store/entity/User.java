@@ -25,6 +25,7 @@ import java.util.UUID;
 @Data
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
+@ToString(exclude = "orders")
 public class User {
 
     @Id

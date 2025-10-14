@@ -2,10 +2,7 @@ package com.pavel.store.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -16,6 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Data
 @Builder
+@ToString(exclude = "order")
 public class OrderItem {
 
     @Id

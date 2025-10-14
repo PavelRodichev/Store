@@ -35,7 +35,7 @@ public class ProductService {
 
 
     @MethodTime
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<ProductResponseDto> getAllProduct(Pageable pageable) {
         Page<Product> productPage = productRepository.findAll(pageable);
         return productPage.map(productMapper::toDto);
@@ -100,7 +100,7 @@ public class ProductService {
     @Transactional
     public ProductResponseDto updateProduct(ProductUpdateDto updateDto, Long id) {
 
-        return productRepository.findById(id)
+        return productRepository.findByIdForUpdate(id)
                 .map(product -> {
                     if (updateDto.getImage() != null) {
                         uploadImage(updateDto.getImage());
@@ -110,7 +110,7 @@ public class ProductService {
                 }).map(productMapper::toDto).orElseThrow();
     }
 
-    @Transactional
+
     public void increaseAllPrices(BigDecimal percent) {
         log.info("Increasing all product prices by {}%", percent);
         if (percent == null) {
@@ -122,15 +122,14 @@ public class ProductService {
         List<Product> products = productRepository.findAll();
         if (products.isEmpty()) {
             log.info("No products found for price update");
-           return;
+            return;
         }
 
-
-        BigDecimal multiplier = BigDecimal.ONE.add(percent.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
-
-        productRepository.updateAllPrices(multiplier);
-
-        log.info("the price of the products has been changed");
-
+        BigDecimal multiply = BigDecimal.ONE.add(percent.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
+        productRepository.updateAllPrices(multiply);
+        log.info("all prices products have been changed");
     }
+
+
 }
+

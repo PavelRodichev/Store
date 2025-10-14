@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @EnableScheduling
 @EnableConfigurationProperties(SchedulingProperties.class)
-@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class StoreApplication {
 
     public static void main(String[] args) {

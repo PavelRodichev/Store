@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin/products")
 @RequiredArgsConstructor
-@Tag(name = "Admin-Product API",description = "админ операции с продуктами")
+@Tag(name = "Admin-Product API", description = "админ операции с продуктами")
 public class AdminProductController {
     private final ProductService productService;
 
     @PostMapping
     public ResponseEntity<ProductResponseDto> createProduct(@RequestBody @Valid ProductCreateDto productDto) {
-        return ResponseEntity.ok(productService.saveProduct(productDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.saveProduct(productDto));
     }
 
     @DeleteMapping("/{id}")

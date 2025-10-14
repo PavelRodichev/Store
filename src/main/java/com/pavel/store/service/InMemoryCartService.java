@@ -3,6 +3,7 @@ package com.pavel.store.service;
 import com.pavel.store.dto.response.CartDto;
 import com.pavel.store.dto.response.CartItemDto;
 import com.pavel.store.entity.Product;
+import com.pavel.store.handler.exeption.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -74,7 +75,7 @@ public class InMemoryCartService {
 
         Product product = productService.findProductById(productId);
         if (product == null) {
-            throw new RuntimeException("Product not found");
+            throw new EntityNotFoundException("Product", productId);
         }
 
         int currentQty = userCart.getOrDefault(productId, 0);

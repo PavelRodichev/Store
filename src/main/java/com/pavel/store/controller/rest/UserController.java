@@ -3,6 +3,7 @@ package com.pavel.store.controller.rest;
 
 import com.pavel.store.dto.request.UserRegistrationDto;
 import com.pavel.store.dto.request.UserUpdateDto;
+import com.pavel.store.dto.response.PageResponse;
 import com.pavel.store.dto.response.UserResponseDto;
 import com.pavel.store.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,15 +33,11 @@ public class UserController {
 
     @Operation(summary = "Get all users with pagination")
     @GetMapping
-    public ResponseEntity<Page<UserResponseDto>> getAllUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "username") String sort
+    public ResponseEntity<PageResponse<UserResponseDto>> getAllUsers(
+            @PageableDefault(size = 20) Pageable pageable
     ) {
-        Sort sortBy = Sort.by(sort);
-        Pageable pageable = PageRequest.of(page, size, sortBy);
         Page<UserResponseDto> users = userService.getAllUsers(pageable);
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(PageResponse.of(users));
     }
 
 
@@ -65,7 +63,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRegistrationDto user) {
 
-        return ResponseEntity.ok(userService.createUser(user));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package com.pavel.store.controller.rest;
 
 import com.pavel.store.dto.request.CategoryRequestDto;
 import com.pavel.store.dto.response.CategoryResponseDto;
+import com.pavel.store.dto.response.PageResponse;
 import com.pavel.store.service.CategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +26,10 @@ public class CategoryController {
 
 
     @GetMapping()
-    public ResponseEntity<Page<CategoryResponseDto>> getAllCategory(@RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "10") int size,
-                                                                    @RequestParam(defaultValue = "name") String sort) {
-        var sortBy = Sort.by(sort);
-        Pageable pageable = PageRequest.of(page, size, sortBy);
-        return ResponseEntity.ok(categoryService.getAll(pageable));
+    public ResponseEntity<PageResponse<CategoryResponseDto>> getAllCategory(@PageableDefault(size = 20) Pageable pageable) {
+
+        var categories = categoryService.getAll(pageable);
+        return ResponseEntity.ok(PageResponse.of(categories));
     }
 
 
@@ -42,7 +42,7 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<CategoryResponseDto> createCategory(@RequestBody CategoryRequestDto categoryRequestDto) {
 
-        return ResponseEntity.ok(categoryService.save(categoryRequestDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.save(categoryRequestDto));
     }
 
     @DeleteMapping("/{id}")

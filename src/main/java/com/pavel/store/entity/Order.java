@@ -2,10 +2,7 @@ package com.pavel.store.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.stereotype.Component;
@@ -22,6 +19,7 @@ import java.util.List;
 @Builder
 @Data
 @EntityListeners(AuditingEntityListener.class)
+@ToString(exclude = {"user", "items"})
 public class Order {
 
     @Id()

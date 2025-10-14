@@ -1,6 +1,7 @@
 package com.pavel.store.controller.rest;
 
 
+import com.pavel.store.dto.response.PageResponse;
 import com.pavel.store.dto.response.ProductResponseDto;
 import com.pavel.store.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,11 +10,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -25,12 +29,12 @@ public class ProductController {
 
 
     @GetMapping
-    public ResponseEntity<Page<ProductResponseDto>> getAllProduct(@RequestParam(defaultValue = "0") int page,
-                                                                  @RequestParam(defaultValue = "10") int size,
-                                                                  @RequestParam(defaultValue = "name") String sort) {
-        var sortBy = Sort.by(sort);
-        Pageable pageable = PageRequest.of(page, size, sortBy);
-        return ResponseEntity.ok(productService.getAllProduct(pageable));
+    public ResponseEntity<PageResponse<ProductResponseDto>> getAllProduct(
+            @PageableDefault(size = 20) Pageable pageable) {
+        Page<ProductResponseDto> result = productService.getAllProduct(pageable);
+
+        return ResponseEntity.ok(PageResponse.of(result));
+
     }
 
 
