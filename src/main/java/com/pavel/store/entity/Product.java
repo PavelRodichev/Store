@@ -58,6 +58,8 @@ public class Product {
 
     private String image;
 
+    @Column(name = "is_available", nullable = false)
+    private boolean isAvailable;
 
     @CreatedDate // ← Будет работать только с @EnableJpaAuditing
     @Column(updatable = false)

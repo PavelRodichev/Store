@@ -1,8 +1,10 @@
 package com.pavel.store.controller.rest;
 
 
+import com.pavel.store.dto.request.ProductFilterDto;
 import com.pavel.store.dto.response.PageResponse;
 import com.pavel.store.dto.response.ProductResponseDto;
+import com.pavel.store.entity.Product;
 import com.pavel.store.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +34,14 @@ public class ProductController {
     public ResponseEntity<PageResponse<ProductResponseDto>> getAllProduct(
             @PageableDefault(size = 20) Pageable pageable) {
         Page<ProductResponseDto> result = productService.getAllProduct(pageable);
-
         return ResponseEntity.ok(PageResponse.of(result));
-
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponseDto>> getFilterProduct(ProductFilterDto productFilterDto) {
+        List<ProductResponseDto> productsList = productService.getProductsWithFilter(productFilterDto);
+        return ResponseEntity.ok(productsList);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getProductById(

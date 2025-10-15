@@ -28,11 +28,10 @@ public class ProductMapperImpl implements ProductMapper {
             throw new IllegalArgumentException("Product  entity is null");
         }
 
-        return ProductResponseDto.builder()
+        ProductResponseDto productResponseDto = ProductResponseDto.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
-                .categoryName(product.getCategory().getName())
                 .description(product.getDescription())
                 .amount(product.getAmount())
                 .article(product.getArticle())
@@ -40,6 +39,11 @@ public class ProductMapperImpl implements ProductMapper {
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .build();
+        // Безопасное извлечение категории
+        if (product.getCategory() != null) {
+            productResponseDto.setCategoryName(product.getCategory().getName());
+        }
+        return productResponseDto;
     }
 
     @Override

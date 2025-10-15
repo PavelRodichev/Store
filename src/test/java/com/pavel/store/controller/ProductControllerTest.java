@@ -126,7 +126,6 @@ public class ProductControllerTest {
     // ========== TESTS FOR findImage ==========
 
 
-
     @Test
     void findImage_WithExistingProductButNoImage_ShouldReturn500() {
         // Предполагая, что у продукта с ID=5 нет изображения (проверьте ваш data.sql)
@@ -136,7 +135,7 @@ public class ProductControllerTest {
                 .get("/api/v1/products/{id}/image")
                 .then()
                 .statusCode(500);
-               // или проверьте структуру ErrorResponse
+        // или проверьте структуру ErrorResponse
     }
 
     @Test
@@ -182,7 +181,6 @@ public class ProductControllerTest {
     }
 
 
-
     @Test
     void getProductById_ShouldReturnCorrectContentType() {
         given()
@@ -217,6 +215,46 @@ public class ProductControllerTest {
 
         // Третий вызов - изображение
         given().pathParam("id", productId).get("/api/v1/products/{id}/image").then().statusCode(500); // или 404
+    }
+
+    @Test
+    void getFilterProductShouldReturn200() {
+        String bodyJson = """
+                {
+                  "amount": 50,
+                  "price": 1000,
+                  "is_Available": true
+                }
+                """;
+        given().body(bodyJson)
+                .when()
+                .get("/api/v1/products/search")
+                .then()
+                .contentType(ContentType.JSON)
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    void getFilterProductShouldReturn200StatusAnd2ElementsIfPrice40() {
+
+        given().param("price", 40)
+                .when()
+                .get("/api/v1/products/search")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("content.size()", equalTo(2));
+
+    }
+    @Test
+    void getFilterProductShouldReturn200StatusAnd2ElementsIfAmount100() {
+
+        given().param("amount", 100)
+                .when()
+                .get("/api/v1/products/search")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("content.size()", equalTo(2));
+
     }
 }
 

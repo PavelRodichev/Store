@@ -3,17 +3,20 @@ package com.pavel.store.service;
 
 import com.pavel.store.aop.MethodTime;
 import com.pavel.store.dto.request.ProductCreateDto;
+import com.pavel.store.dto.request.ProductFilterDto;
 import com.pavel.store.dto.request.ProductUpdateDto;
 import com.pavel.store.dto.response.ProductResponseDto;
 import com.pavel.store.entity.Product;
 import com.pavel.store.mapper.implMapper.ProductMapperImpl;
 import com.pavel.store.repository.ProductRepository;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
+import com.pavel.store.repository.specification.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -21,8 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,6 +38,20 @@ public class ProductService {
     private final ProductMapperImpl productMapper;
     private final ImageService imageService;
 
+    @Transactional
+    @MethodTime
+    public List<ProductResponseDto> getProductsWithFilter(ProductFilterDto productFilterDto) {
+        Specification<Product> scpec;
+        List<Product> listProducts = new ArrayList<>();
+        if (productFilterDto != null) {
+            scpec = new ProductSpecification().withFilter(productFilterDto.getName()
+                    , productFilterDto.getAmount()
+                    , productFilterDto.getPrice(),
+                    productFilterDto.getIsAvailable());
+            listProducts = productRepository.findAll(scpec);
+        }
+        return listProducts.stream().map(productMapper::toDto).collect(Collectors.toList());
+    }
 
     @MethodTime
     @Transactional
