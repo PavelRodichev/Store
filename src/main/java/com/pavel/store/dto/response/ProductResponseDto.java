@@ -20,6 +20,8 @@ public class ProductResponseDto {
 
     BigDecimal price;
 
+    BigDecimal exchangeRate;
+
     Integer amount;
 
     String article;
@@ -29,5 +31,7 @@ public class ProductResponseDto {
     LocalDateTime createdAt;
 
     LocalDateTime updatedAt;
+
+    Boolean available;
 
 }

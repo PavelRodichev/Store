@@ -38,9 +38,12 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ProductResponseDto>> getFilterProduct(ProductFilterDto productFilterDto) {
-        List<ProductResponseDto> productsList = productService.getProductsWithFilter(productFilterDto);
-        return ResponseEntity.ok(productsList);
+    public ResponseEntity<PageResponse<ProductResponseDto>> getFilterProduct(
+            ProductFilterDto productFilterDto,
+            @PageableDefault(size = 20) Pageable pageable) {
+
+        Page<ProductResponseDto> productsList = productService.getProductsWithFilter(productFilterDto, pageable);
+        return ResponseEntity.ok(PageResponse.of(productsList));
     }
 
     @GetMapping("/{id}")

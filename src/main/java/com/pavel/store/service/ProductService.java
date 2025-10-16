@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,17 +39,18 @@ public class ProductService {
 
     @Transactional
     @MethodTime
-    public List<ProductResponseDto> getProductsWithFilter(ProductFilterDto productFilterDto) {
-        Specification<Product> scpec;
-        List<Product> listProducts = new ArrayList<>();
-        if (productFilterDto != null) {
-            scpec = new ProductSpecification().withFilter(productFilterDto.getName()
-                    , productFilterDto.getAmount()
-                    , productFilterDto.getPrice(),
-                    productFilterDto.getIsAvailable());
-            listProducts = productRepository.findAll(scpec);
-        }
-        return listProducts.stream().map(productMapper::toDto).collect(Collectors.toList());
+    public Page<ProductResponseDto> getProductsWithFilter(ProductFilterDto productFilterDto, Pageable pageable) {
+        Specification<Product> spec = new ProductSpecification()
+                .withFilter(
+                        productFilterDto.getName()
+                        , productFilterDto.getAmount()
+                        , productFilterDto.getPrice(),
+                        productFilterDto.getIsAvailable());
+
+        Page<Product> listProducts = productRepository.findAll(spec, pageable);
+
+
+        return listProducts.map(productMapper::toDto);
     }
 
     @MethodTime

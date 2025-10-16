@@ -38,6 +38,7 @@ public class ProductMapperImpl implements ProductMapper {
                 .image(product.getImage())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
+                .available(product.getAvailable())
                 .build();
         // Безопасное извлечение категории
         if (product.getCategory() != null) {

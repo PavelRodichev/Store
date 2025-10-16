@@ -45,6 +45,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByIdForUpdate(@Param(value = "id") Long id);
 
     @EntityGraph(attributePaths = {"category"})
-    List<Product> findAll(Specification<Product> specification);
+    Page<Product> findAll(Specification<Product> specification, Pageable pageable);
 
 }
