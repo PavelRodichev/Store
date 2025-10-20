@@ -3,9 +3,11 @@ package com.pavel.store.handler.Enhancer;
 import com.pavel.store.controller.rest.ProductController;
 import com.pavel.store.dto.response.PageResponse;
 import com.pavel.store.dto.response.ProductResponseDto;
+
+import com.pavel.store.service.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -17,7 +19,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,8 +30,7 @@ import java.util.stream.Collectors;
 public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
 
 
-    private final ExchangeRateProvider exchangeRateProvider;
-
+    private final ExchangeService exchangeService;
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -52,7 +52,7 @@ public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
             if (body instanceof ProductResponseDto product) {
                 return enhanceProduct(product);
             } else if (body instanceof PageResponse<?> page) {
-                return enhancePageResponse(page); // ✅ Теперь можно безопасно приводить!
+                return enhancePageResponse(page);
             }
             return body;
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
     }
 
     private Object enhancePageResponse(PageResponse<?> pageResponse) {
-        BigDecimal rate = exchangeRateProvider.getExchangeRate();
+        BigDecimal rate = exchangeService.getRateFrom();
 
         List<Object> convertedContent = pageResponse.getContent().stream()
                 .map(item -> {
@@ -86,7 +86,7 @@ public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
     }
 
     private ProductResponseDto enhanceProduct(ProductResponseDto product) {
-        BigDecimal rate = exchangeRateProvider.getExchangeRate();
+        BigDecimal rate = exchangeService.getRateFrom();
         BigDecimal convertedPrice = calculateConvertedPrice(product.getPrice(), rate);
         return buildConvertedProduct(product, convertedPrice);
     }

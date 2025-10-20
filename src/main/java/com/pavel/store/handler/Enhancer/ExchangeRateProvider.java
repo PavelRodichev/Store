@@ -4,13 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 
-@Component
+@Service
 public class ExchangeRateProvider {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
