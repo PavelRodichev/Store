@@ -4,7 +4,7 @@ import com.pavel.store.controller.rest.ProductController;
 import com.pavel.store.dto.response.PageResponse;
 import com.pavel.store.dto.response.ProductResponseDto;
 
-import com.pavel.store.service.ExchangeService;
+import com.pavel.store.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
 
 
-    private final ExchangeService exchangeService;
+    private final CurrencyService currencyService;
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -62,7 +62,7 @@ public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
     }
 
     private Object enhancePageResponse(PageResponse<?> pageResponse) {
-        BigDecimal rate = exchangeService.getRateFrom();
+        BigDecimal rate = currencyService.getRate();
 
         List<Object> convertedContent = pageResponse.getContent().stream()
                 .map(item -> {
@@ -86,7 +86,7 @@ public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
     }
 
     private ProductResponseDto enhanceProduct(ProductResponseDto product) {
-        BigDecimal rate = exchangeService.getRateFrom();
+        BigDecimal rate = currencyService.getRate();
         BigDecimal convertedPrice = calculateConvertedPrice(product.getPrice(), rate);
         return buildConvertedProduct(product, convertedPrice);
     }

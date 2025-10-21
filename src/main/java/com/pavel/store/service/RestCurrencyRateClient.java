@@ -1,9 +1,11 @@
 package com.pavel.store.service;
 
+import com.pavel.store.controller.rest.session.SessionCurrency;
 import com.pavel.store.handler.Enhancer.ExchangeRateProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,19 +15,22 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
+@ConditionalOnProperty(name = "interaction.rate.stub", havingValue = "false")
 @Slf4j
-public class ExchangeService {
+@RequiredArgsConstructor
+public class RestCurrencyRateClient implements CurrencyRateClient {
 
     private final RestTemplate restTemplate;
 
     private final ExchangeRateProvider exchangeRateProvider;
 
+    private final SessionCurrency sessionCurrency;
+
     @Value("${currency.service.url}")
     private String currencyServiceUrl;
 
     @Cacheable(cacheNames = "exchangeRate", unless = "#result == null")
-    public BigDecimal getRateFrom() {
+    public BigDecimal getRate() {
         log.info("Cache empty - fetching fresh rate...");
         try {
             return getRateFromService();
@@ -36,25 +41,39 @@ public class ExchangeService {
     }
 
     private BigDecimal getRateFromFile() {
-        return exchangeRateProvider.getExchangeRate();
+        Map<Object, Object> rate = exchangeRateProvider.getExchangeRate();
+        if (!rate.isEmpty() && rate.containsKey(sessionCurrency.getCurrency())) {
+            String currency = sessionCurrency.getCurrency();
+            Object currentRate = rate.get(currency);
+            if (currentRate instanceof Double) {
+                return BigDecimal.valueOf((Double) currentRate);
+            }
+        }
+        System.out.println();
+        return BigDecimal.ONE;
     }
 
     private BigDecimal getRateFromService() {
+
         try {
             ResponseEntity<Map> responseEntity = restTemplate.getForEntity(currencyServiceUrl, Map.class);
+            String currency = sessionCurrency.getCurrency();
             if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
-                Object rate = responseEntity.getBody().get("exchangeRate");
+                if (responseEntity.getBody().containsKey(currency)) {
+                    Object rate = responseEntity.getBody().get(currency);
 
-                if (rate instanceof Double) {
-                    return BigDecimal.valueOf((Double) rate);
+                    if (rate instanceof Double) {
+                        return BigDecimal.valueOf((Double) rate);
+                    }
+                    log.info("Successfully got a rate from service: {}", rate);
                 }
-                log.info("Successfully got a rate from service: {}", rate);
+                throw new RuntimeException("Service returned error status");
             }
-            throw new RuntimeException("Service returned error status");
         } catch (RuntimeException ex) {
             throw new RuntimeException("Service call failed: " + ex.getMessage());
         }
-
+        return BigDecimal.ONE;
     }
-
 }
+
+
