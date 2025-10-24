@@ -29,9 +29,9 @@ public class RestCurrencyRateClient implements CurrencyRateClient {
     @Value("${currency.service.url}")
     private String currencyServiceUrl;
 
-    @Cacheable(cacheNames = "exchangeRate", unless = "#result == null")
+
     public BigDecimal getRate() {
-        log.info("Cache empty - fetching fresh rate...");
+
         try {
             return getRateFromService();
         } catch (Exception e) {
@@ -41,6 +41,7 @@ public class RestCurrencyRateClient implements CurrencyRateClient {
     }
 
     private BigDecimal getRateFromFile() {
+        log.info("get rate from json file");
         Map<Object, Object> rate = exchangeRateProvider.getExchangeRate();
         if (!rate.isEmpty() && rate.containsKey(sessionCurrency.getCurrency())) {
             String currency = sessionCurrency.getCurrency();
@@ -49,12 +50,11 @@ public class RestCurrencyRateClient implements CurrencyRateClient {
                 return BigDecimal.valueOf((Double) currentRate);
             }
         }
-        System.out.println();
+
         return BigDecimal.ONE;
     }
 
     private BigDecimal getRateFromService() {
-
         try {
             ResponseEntity<Map> responseEntity = restTemplate.getForEntity(currencyServiceUrl, Map.class);
             String currency = sessionCurrency.getCurrency();
@@ -67,7 +67,7 @@ public class RestCurrencyRateClient implements CurrencyRateClient {
                     }
                     log.info("Successfully got a rate from service: {}", rate);
                 }
-                throw new RuntimeException("Service returned error status");
+
             }
         } catch (RuntimeException ex) {
             throw new RuntimeException("Service call failed: " + ex.getMessage());

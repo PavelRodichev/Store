@@ -15,7 +15,6 @@ public interface OrderMapper {
 
 
     @Mapping(target = "username", source = "user.username")
-    @Mapping(target = "items", source = "order.items")
     @Mapping(target = "orderStatus", source = "orderStatus")
     @Mapping(target = "orderDate", source = "orderDate")
     OrderResponseDto toDto(Order order);

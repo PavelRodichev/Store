@@ -29,5 +29,7 @@ public class UserResponseDto {
     private Role role;
 
     private LocalDateTime createdAt;
-    
+
+    private String inn;
+
 }

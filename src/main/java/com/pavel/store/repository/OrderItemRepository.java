@@ -1,5 +1,6 @@
 package com.pavel.store.repository;
 
+import com.pavel.store.entity.Order;
 import com.pavel.store.entity.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +22,5 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("SELECT SUM(oi.productPrice) FROM OrderItem oi WHERE oi.order.id = :orderId")
     Optional<BigDecimal> calculateOrderTotalAmount(@Param("orderId") Long orderId);
-
 
 }

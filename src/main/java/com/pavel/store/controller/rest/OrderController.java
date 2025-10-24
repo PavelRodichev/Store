@@ -1,21 +1,23 @@
 package com.pavel.store.controller.rest;
 
 import com.pavel.store.dto.request.OrderCreateDto;
+import com.pavel.store.dto.request.OrderItemRequestDto;
 import com.pavel.store.dto.request.OrderUpdateDto;
-import com.pavel.store.dto.response.OrderResponseDto;
-import com.pavel.store.dto.response.PageResponse;
+import com.pavel.store.dto.response.*;
 import com.pavel.store.service.OrderService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -27,7 +29,6 @@ public class OrderController {
 
     private final OrderService orderService;
 
-
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderCreateDto request) {
         log.info("Received request to create order for user: {}", request.getUserId());
@@ -35,6 +36,14 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<List<OrderResponseDto>> findOrdersByProductId(@PathVariable @NotNull Long productId) {
+
+        List<OrderResponseDto> list = orderService.getOrdersByProductId(productId);
+
+        return ResponseEntity.ok(list);
+    }
 
     @GetMapping
     public ResponseEntity<PageResponse<OrderResponseDto>> getAllOrders(
@@ -72,4 +81,15 @@ public class OrderController {
         return ResponseEntity.ok(orderService.updateOrderById(orderUpdateDto, id));
     }
 
+    @PutMapping
+    public ResponseEntity<OrderResponseDto> addItemsToOrder(@RequestBody OrderItemRequestDto orderItemRequestDto, @RequestParam Long orderId) {
+
+        OrderResponseDto orderResponseDto = orderService.addItemsToOrder(orderItemRequestDto, orderId);
+        return ResponseEntity.ok(orderResponseDto);
+    }
+
+    @GetMapping("/groupOfProducts")
+    public ResponseEntity<List<ProductWithOrdersResponse>> getProductsGroupingOrders() {
+        return ResponseEntity.ok(orderService.getGroupingProductsByOrder());
+    }
 }

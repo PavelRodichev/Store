@@ -29,7 +29,6 @@ public class OrderResponseDto {
 
     private String address;
 
-    private List<OrderItemResponseDto> items;
 
 
 }

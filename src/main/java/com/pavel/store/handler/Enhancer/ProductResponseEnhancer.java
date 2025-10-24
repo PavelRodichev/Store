@@ -1,5 +1,6 @@
 package com.pavel.store.handler.Enhancer;
 
+import com.pavel.store.controller.rest.OrderController;
 import com.pavel.store.controller.rest.ProductController;
 import com.pavel.store.dto.response.PageResponse;
 import com.pavel.store.dto.response.ProductResponseDto;
@@ -23,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestControllerAdvice(assignableTypes = ProductController.class)
+@RestControllerAdvice(assignableTypes = {ProductController.class, OrderController.class})
 @Component
 @Slf4j
 @RequiredArgsConstructor
