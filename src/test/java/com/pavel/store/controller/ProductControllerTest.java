@@ -43,7 +43,7 @@ public class ProductControllerTest {
                 .contentType(ContentType.JSON)
                 .body("content", hasSize(13))
                 .body("totalElements", equalTo(13))
-                .body("pageSize", equalTo(20));
+                .body("size", equalTo(20));
 
     }
 

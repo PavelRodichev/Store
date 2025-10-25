@@ -48,7 +48,7 @@ public class AdminProductController {
                 .when()
                 .post("/api/admin/products")
                 .then()
-                .statusCode(200)
+                .statusCode(201)
                 .body("id", notNullValue())
                 .body("name", equalTo("LaptoPProduct"))
                 .body("price", equalTo(999.99F));

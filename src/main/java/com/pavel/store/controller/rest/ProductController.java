@@ -31,19 +31,19 @@ public class ProductController {
 
 
     @GetMapping
-    public ResponseEntity<PageResponse<ProductResponseDto>> getAllProduct(
+    public ResponseEntity<Page<ProductResponseDto>> getAllProduct(
             @PageableDefault(size = 20) Pageable pageable) {
         Page<ProductResponseDto> result = productService.getAllProduct(pageable);
-        return ResponseEntity.ok(PageResponse.of(result));
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<PageResponse<ProductResponseDto>> getFilterProduct(
+    public ResponseEntity<Page<ProductResponseDto>> getFilterProduct(
             ProductFilterDto productFilterDto,
             @PageableDefault(size = 20) Pageable pageable) {
 
         Page<ProductResponseDto> productsList = productService.getProductsWithFilter(productFilterDto, pageable);
-        return ResponseEntity.ok(PageResponse.of(productsList));
+        return ResponseEntity.ok(productsList);
     }
 
     @GetMapping("/{id}")
