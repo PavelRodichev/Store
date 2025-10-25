@@ -43,5 +43,6 @@ public class ProductCreateDto {
 
     private MultipartFile image;
 
-
+    @NotNull(message = "is_available cannot be null")
+    private Boolean available = true;
 }

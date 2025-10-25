@@ -58,8 +58,9 @@ public class Product {
 
     private String image;
 
-    @Column(name = "is_available", nullable = false)
-    private Boolean available = true;
+
+    @Column(name = "is_available",nullable = false)
+    private Boolean isAvailable = true;
 
     @CreatedDate // ← Будет работать только с @EnableJpaAuditing
     @Column(updatable = false)
@@ -67,5 +68,9 @@ public class Product {
 
     @LastModifiedDate // ← Будет работать только с @EnableJpaAuditing
     private LocalDateTime updatedAt;
+
+    public void setIsAvailable(Boolean isAvailable) {
+        this.isAvailable = isAvailable != null ? isAvailable : true;
+    }
 
 }

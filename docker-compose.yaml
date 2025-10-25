@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  inn-service:
+    build:
+      context: .
+      dockerfile: inn-service/Dockerfile
+    image: inn-service:latest
+    ports:
+      - "8082:8082"
+    container_name: inn-service
+
+
+  currency-service:
+    build:
+      context: .
+      dockerfile: currency-service/Dockerfile
+    image: currency-service:latest
+    ports:
+      - "8081:8081"
+    container_name: currency-service
+
+

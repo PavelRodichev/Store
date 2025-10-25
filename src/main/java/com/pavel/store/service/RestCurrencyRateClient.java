@@ -33,6 +33,7 @@ public class RestCurrencyRateClient implements CurrencyRateClient {
     public BigDecimal getRate() {
 
         try {
+            log.info("are trying to get a course from the service..");
             return getRateFromService();
         } catch (Exception e) {
             log.info("Service unavailable:{}", e.getMessage());

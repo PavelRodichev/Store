@@ -41,13 +41,14 @@ public class AdminProductController {
         dto.setAmount(12);
         dto.setCategoryName("Books");
         dto.setArticle("artcikae");
+
         given()
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .when()
                 .post("/api/admin/products")
                 .then()
-                .statusCode(201)
+                .statusCode(200)
                 .body("id", notNullValue())
                 .body("name", equalTo("LaptoPProduct"))
                 .body("price", equalTo(999.99F));

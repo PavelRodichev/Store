@@ -38,7 +38,7 @@ public class ProductMapperImpl implements ProductMapper {
                 .image(product.getImage())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
-                .available(product.getAvailable())
+                .available(product.getIsAvailable())
                 .build();
         // Безопасное извлечение категории
         if (product.getCategory() != null) {
@@ -62,6 +62,7 @@ public class ProductMapperImpl implements ProductMapper {
                 .amount(productCreateDto.getAmount())
                 .article(productCreateDto.getArticle())
                 .category(category)
+                .isAvailable(true)
                 .build();
 
         Optional.ofNullable(productCreateDto.getImage())

@@ -62,7 +62,7 @@ public class UserServiceTest {
 
         when(userMapper.toDto(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0); // Получаем реальный User
-            return new UserResponseDto(user.getId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), Role.USER, LocalDateTime.now());
+            return new UserResponseDto(user.getId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), Role.USER, LocalDateTime.now(), null);
         });
 
         Page<UserResponseDto> result = userService.getAllUsers(pageable);
