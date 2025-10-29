@@ -1,4 +1,4 @@
-package com.pavel.store.handler.sheduler;
+package com.pavel.store.sheduler;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

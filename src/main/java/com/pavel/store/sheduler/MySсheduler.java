@@ -1,4 +1,4 @@
-package com.pavel.store.handler.sheduler;
+package com.pavel.store.sheduler;
 
 import com.pavel.store.entity.Product;
 import com.pavel.store.repository.ProductRepository;
