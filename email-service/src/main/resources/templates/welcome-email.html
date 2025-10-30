@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Добро пожаловать в наш магазин!</h1>
+    </div>
+    <div class="content">
+        <p>Здравствуйте! <span th:text="${firstName+' '+lastName}">Name</span>
+
+        </p>
+        <p>Спасибо за регистрацию в нашем интернет-магазине.</p>
+        <p>Теперь вы можете:</p>
+        <ul>
+            <li>Совершать покупки</li>
+            <li>Отслеживать заказы</li>
+            <li>Получать специальные предложения</li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>© 2025 Your Store. Все права защищены.</p>
+    </div>
+</div>
+</body>
+</html>

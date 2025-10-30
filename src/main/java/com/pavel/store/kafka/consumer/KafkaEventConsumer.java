@@ -1,4 +1,4 @@
-package com.pavel.store.consumer;
+package com.pavel.store.kafka.consumer;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;

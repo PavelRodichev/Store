@@ -31,6 +31,14 @@ public class UserController {
     private final UserService userService;
 
 
+    @Transactional
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDto> registration(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
+        var userResponse = userService.createUser(userRegistrationDto);
+        return ResponseEntity.ok(userResponse);
+
+    }
+
     @Operation(summary = "Get all users with pagination")
     @GetMapping
     public ResponseEntity<PageResponse<UserResponseDto>> getAllUsers(
@@ -56,14 +64,6 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
 
         return ResponseEntity.ok(userService.getUserById(id));
-    }
-
-
-    @Operation(summary = "create user")
-    @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRegistrationDto user) {
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
     }
 
     @Transactional

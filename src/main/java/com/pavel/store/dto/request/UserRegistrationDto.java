@@ -35,6 +35,6 @@ public class UserRegistrationDto {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    // Обычно устанавливается автоматически
+
 
 }

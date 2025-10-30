@@ -3,6 +3,8 @@ package com.pavel.store.service;
 
 import com.pavel.store.aop.MethodTime;
 import com.pavel.store.entity.CustomUserDetails;
+import com.pavel.store.events.UserRegisteredEvent;
+import com.pavel.store.handler.eventshandlers.EventHandlerDispatcher;
 import com.pavel.store.handler.exeption.EntityAlreadyExistsException;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.UserRegistrationDto;
@@ -39,6 +41,7 @@ public class UserService implements UserDetailsService {
 
     private final UserMapperImpl userMapper;
 
+    private final EventHandlerDispatcher eventHandlerDispatcher;
 
     @Transactional(readOnly = true)
     public Page<UserResponseDto> getAllUsers(Pageable pageable) {
@@ -77,7 +80,20 @@ public class UserService implements UserDetailsService {
 
         User userSave = userMapper.toEntity(userRegistrationDto);
         userSave.setRole(Role.USER);
+
         log.info("User created");
+
+        UserRegisteredEvent userRegisteredEvent = new UserRegisteredEvent();
+        userRegisteredEvent.setEmail(userSave.getEmail());
+        userRegisteredEvent.setUsername(userSave.getUsername());
+        userRegisteredEvent.setFirstName(userSave.getFirstName());
+        userRegisteredEvent.setLastName(userSave.getLastName());
+        userRegisteredEvent.setEvent("USER_REGISTERED");
+
+        eventHandlerDispatcher.dispatch(userRegisteredEvent);
+
+        log.info("The user's registration information was sent to the appropriate handler");
+
         return userMapper.toDto(userRepository.saveAndFlush(userSave));
     }
 
