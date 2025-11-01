@@ -18,6 +18,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class UserRegisteredEventHandler implements EventHandler {
+
     private final KafkaEventProducer kafkaEventProducer;
 
     @Override

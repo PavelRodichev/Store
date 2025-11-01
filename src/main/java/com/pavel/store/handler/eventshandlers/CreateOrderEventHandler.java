@@ -12,9 +12,18 @@ public class CreateOrderEventHandler implements EventHandler {
 
     @Override
     public void handle(EventSource event) {
-        CreateOrderEvent orderEvent = (CreateOrderEvent) event;
-        log.info("🎯 WORKING HANDLER: Order {} for user {}", orderEvent.getOrderId(), orderEvent.getUserId());
-        log.info("📦 Items: {}, Address: {}", orderEvent.getItems(), orderEvent.getAddress());
+
+        if (!(event instanceof CreateOrderEvent)) {
+            log.warn("Invalid event type: {}", event.getClass().getSimpleName());
+            return;
+        }
+        try {
+            CreateOrderEvent orderEvent = (CreateOrderEvent) event;
+            log.info("🎯 WORKING HANDLER: Order {} for user {}", orderEvent.getOrderId(), orderEvent.getUserId());
+            log.info("📦 Items: {}, Address: {}", orderEvent.getItems(), orderEvent.getAddress());
+        } catch (Exception e) {
+            log.error("error processing CancelledOrderEvent");
+        }
     }
 
     @Override

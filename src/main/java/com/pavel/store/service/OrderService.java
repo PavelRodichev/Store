@@ -205,7 +205,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponseDto ChangeAddress(String newAddress, Long orderId) {
+    public OrderResponseDto changeAddress(String newAddress, Long orderId) {
 
 
         var order = orderRepository.findById(orderId).orElseThrow(() ->
@@ -213,6 +213,22 @@ public class OrderService {
         order.setAddress(newAddress);
         log.info("Order {} address changed to: {}", orderId, newAddress);
 
+        return orderMapper.toDto(order);
+    }
+
+    @Transactional
+    public OrderResponseDto completedOrder(Long orderId) {
+        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order", orderId));
+        order.setOrderStatus(OrderStatus.COMPLETED);
+        log.info("order status changed to:{}", order.getOrderStatus());
+        return orderMapper.toDto(order);
+    }
+
+    @Transactional
+    public OrderResponseDto cancelledOrder(Long orderId) {
+        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order", orderId));
+        order.setOrderStatus(OrderStatus.CANCELLED);
+        log.info("Order {} order status changed to:{}", order.getId(), order.getOrderStatus());
         return orderMapper.toDto(order);
     }
 
