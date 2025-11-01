@@ -28,22 +28,17 @@ public class MySсheduler {
     private boolean enable;
 
 
-    @Transactional
     @Scheduled(fixedRateString = "${app.scheduling.period}")
     public void increaseInThePriceOfTheProduct() {
         if (!enable) {
             return;
         }
-        log.info("🔄 SCHEDULER STARTED - БЛОКИРУЮ ТОВАРЫ!");
-        //  Блокируем все товары
-        List<Product> products = productRepository.findAllWithPessimisticWrite();
-        log.info("🔒 SCHEDULER: Заблокировал {} товаров", products.size());
-
         try {
             productService.increaseAllPrices(BigDecimal.valueOf(10));
+            log.info(" SCHEDULER STARTED - БЛОКИРУЮ ТОВАРЫ!");
             for (int i = 1; i <= 15; i++) {
                 Thread.sleep(1000);
-                log.info("🔒 SCHEDULER: Держу FOR UPDATE... {} сек", i);
+                log.info("SCHEDULER: Держу FOR UPDATE... {} сек", i);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

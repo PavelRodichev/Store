@@ -3,6 +3,7 @@ package com.pavel.store.service;
 import com.pavel.store.aop.MethodTime;
 import com.pavel.store.dto.request.OrderUpdateDto;
 import com.pavel.store.dto.response.*;
+import com.pavel.store.events.ChangeAddressEvent;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.OrderCreateDto;
 import com.pavel.store.dto.request.OrderItemRequestDto;
@@ -10,6 +11,7 @@ import com.pavel.store.entity.*;
 
 import com.pavel.store.mapper.mapers.OrderMapper;
 
+import com.pavel.store.mapper.mapers.OrderMapperImpl;
 import com.pavel.store.mapper.mapers.ProductMapper;
 import com.pavel.store.mapper.mapers.UserMapper;
 import com.pavel.store.repository.OrderRepository;
@@ -39,7 +41,6 @@ public class OrderService {
     private final ProductService productService;
     private final ProductRepository productRepository;
     private final RestTemplate restTemplate;
-    private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final ProductMapper productMapper;
 
@@ -200,6 +201,18 @@ public class OrderService {
         }
 
         order.calculateTotalAmount();
+        return orderMapper.toDto(order);
+    }
+
+    @Transactional
+    public OrderResponseDto ChangeAddress(String newAddress, Long orderId) {
+
+
+        var order = orderRepository.findById(orderId).orElseThrow(() ->
+                new EntityNotFoundException("Order", orderId));
+        order.setAddress(newAddress);
+        log.info("Order {} address changed to: {}", orderId, newAddress);
+
         return orderMapper.toDto(order);
     }
 

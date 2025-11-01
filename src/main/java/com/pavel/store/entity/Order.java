@@ -22,7 +22,7 @@ import java.util.List;
 @ToString(exclude = {"user", "items"})
 public class Order {
 
-    @Id()
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 

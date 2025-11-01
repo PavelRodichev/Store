@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,7 +42,7 @@ public class UserService implements UserDetailsService {
 
     private final UserMapperImpl userMapper;
 
-    private final EventHandlerDispatcher eventHandlerDispatcher;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Transactional(readOnly = true)
     public Page<UserResponseDto> getAllUsers(Pageable pageable) {
@@ -90,7 +91,7 @@ public class UserService implements UserDetailsService {
         userRegisteredEvent.setLastName(userSave.getLastName());
         userRegisteredEvent.setEvent("USER_REGISTERED");
 
-        eventHandlerDispatcher.dispatch(userRegisteredEvent);
+        kafkaTemplate.send("events", userRegisteredEvent);
 
         log.info("The user's registration information was sent to the appropriate handler");
 

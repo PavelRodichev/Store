@@ -129,7 +129,7 @@ public class ProductService {
                 }).map(productMapper::toDto).orElseThrow();
     }
 
-
+    @Transactional
     public void increaseAllPrices(BigDecimal percent) {
         log.info("Increasing all product prices by {}%", percent);
         if (percent == null) {
@@ -138,7 +138,7 @@ public class ProductService {
         if (percent.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Percentage must be positive: " + percent);
         }
-        List<Product> products = productRepository.findAll();
+        List<Product> products = productRepository.findAllWithPessimisticWrite();
         if (products.isEmpty()) {
             log.info("No products found for price update");
             return;

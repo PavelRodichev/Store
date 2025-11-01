@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.core.MethodParameter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -52,7 +55,7 @@ public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
 
             if (body instanceof ProductResponseDto product) {
                 return enhanceProduct(product);
-            } else if (body instanceof PageResponse<?> page) {
+            } else if (body instanceof Page<?> page) {
                 return enhancePageResponse(page);
             }
             return body;
@@ -62,10 +65,10 @@ public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
         }
     }
 
-    private Object enhancePageResponse(PageResponse<?> pageResponse) {
+    private Object enhancePageResponse(Page<?> page) {
         BigDecimal rate = currencyService.getRate();
 
-        List<Object> convertedContent = pageResponse.getContent().stream()
+        List<Object> convertedContent = page.getContent().stream()
                 .map(item -> {
                     if (item instanceof ProductResponseDto product) {
                         //  Это продукт - конвертируем
@@ -78,12 +81,8 @@ public class ProductResponseEnhancer implements ResponseBodyAdvice<Object> {
                 .collect(Collectors.toList());
 
 
-        return PageResponse.builder().content(Arrays.asList(convertedContent))
-                .totalPages(pageResponse.getTotalPages()).currentPage(pageResponse.getCurrentPage())
-                .pageSize(pageResponse.getPageSize())
-                .totalElements(pageResponse.getTotalElements())
-                .first(pageResponse.isFirst())
-                .last(pageResponse.isLast()).build();
+        return new PageImpl<>(convertedContent, page.getPageable(), page.getTotalElements());
+
     }
 
     private ProductResponseDto enhanceProduct(ProductResponseDto product) {

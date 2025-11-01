@@ -2,6 +2,7 @@ package com.pavel.store.kafka.producer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pavel.store.dto.request.EmailMessage;
+import com.pavel.store.events.EventSource;
 import com.pavel.store.events.UserRegisteredEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
