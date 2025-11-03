@@ -1,18 +1,32 @@
 package com.pavel.store.controller;
 
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
+
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.annotation.DirtiesContext;
 
+
+import java.util.concurrent.CompletableFuture;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any; // ✅ ДОБАВЬТЕ ЭТОТ ИМПОРТ
+import static org.mockito.ArgumentMatchers.anyString; // ✅ ДОБАВЬТЕ ЭТОТ ИМПОРТ
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -23,11 +37,18 @@ public class UserControllerTest {
     @LocalServerPort
     private int port;
 
+    @MockitoBean
+    private KafkaTemplate<String, Object> kafkaTemplateMock;
+
     @BeforeEach
     void setUp() {
-        RestAssured.baseURI = "http://localhost";
+        baseURI = "http://localhost";
         RestAssured.port = port;
-        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        enableLoggingOfRequestAndResponseIfValidationFails();
+
+        // ✅ Правильный стабинг для KafkaTemplate
+        when(kafkaTemplateMock.send(anyString(), any()))
+                .thenReturn(CompletableFuture.completedFuture(null));
     }
 
     @Test
@@ -46,9 +67,9 @@ public class UserControllerTest {
                 .contentType(ContentType.JSON)
                 .body(jsonBody)
                 .when()
-                .post("/api/v1/users") // Добавлен слеш в начале
+                .post("/api/v1/users/register")
                 .then()
-                .statusCode(201) // Изменено на 201 Created (более семантично)
+                .statusCode(200)
                 .contentType(ContentType.JSON)
                 .body("id", notNullValue())
                 .body("username", equalTo("Test1Username"))
@@ -75,7 +96,7 @@ public class UserControllerTest {
                 .contentType(ContentType.JSON)
                 .body(jsonBody)
                 .when()
-                .post("/api/v1/users") // Добавлен слеш в начале
+                .post("/api/v1/users/register") // Добавлен слеш в начале
                 .then()
                 .statusCode(400)
                 .contentType(ContentType.JSON)
@@ -170,52 +191,55 @@ public class UserControllerTest {
                 """;
         given().contentType(ContentType.JSON)
                 .body(jsonBody).
-                when().post("api/v1/users")
+                when().post("api/v1/users/register")
                 .then().statusCode(400).body("exception", equalTo("MethodArgumentNotValidException"))
                 .body("message", equalTo("username: Username is required"));
 
 
     }
+
     @Test
     void createUser_WithoutPassword_ShouldReturn400() {
         String jsonWithoutPassword = """
-            {
-                "username": "testuser",
-                "email": "test@example.com",
-                "firstName": "John",
-                "lastName": "Doe"
-            }
-            """;
+                {
+                    "username": "testuser",
+                    "email": "test@example.com",
+                    "firstName": "John",
+                    "lastName": "Doe"
+                }
+                """;
 
         given()
                 .contentType(ContentType.JSON)
                 .body(jsonWithoutPassword)
                 .when()
-                .post("/api/v1/users")
+                .post("/api/v1/users/register")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("message", containsString("password"));
     }
+
     @Test
     void createUser_WithoutEmail_ShouldReturn400() {
         String jsonWithoutEmail = """
-        {
-            "username": "testuser",
-            "password": "password123",
-            "firstName": "John",
-            "lastName": "Doe"
-        }
-        """;
+                {
+                    "username": "testuser",
+                    "password": "password123",
+                    "firstName": "John",
+                    "lastName": "Doe"
+                }
+                """;
 
         given()
                 .contentType(ContentType.JSON)
                 .body(jsonWithoutEmail)
                 .when()
-                .post("/api/v1/users")
+                .post("/api/v1/users/register")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("message", containsString("email")); // Проверяем что ошибка связана с отсутствующим email
     }
+
     @Test
     void createUser_WithBlankEmail_ShouldReturn400() {
         String jsonWithBlankEmail = """
@@ -232,7 +256,7 @@ public class UserControllerTest {
                 .contentType(ContentType.JSON)
                 .body(jsonWithBlankEmail)
                 .when()
-                .post("/api/v1/users")
+                .post("/api/v1/users/register")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("message",
@@ -248,20 +272,20 @@ public class UserControllerTest {
     @Test
     void createUser_WithBlankUsername_ShouldReturn400() {
         String jsonWithBlankUsername = """
-        {
-            "username": "   ",
-            "email": "test@example.com",
-            "password": "password123",
-            "firstName": "John",
-            "lastName": "Doe"
-        }
-        """;
+                {
+                    "username": "   ",
+                    "email": "test@example.com",
+                    "password": "password123",
+                    "firstName": "John",
+                    "lastName": "Doe"
+                }
+                """;
 
         given()
                 .contentType(ContentType.JSON)
                 .body(jsonWithBlankUsername)
                 .when()
-                .post("/api/v1/users")
+                .post("/api/v1/users/register")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("message", containsString("username")); // Проверяем что ошибка связана с username

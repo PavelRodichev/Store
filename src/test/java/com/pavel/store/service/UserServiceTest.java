@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -35,6 +36,8 @@ public class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserMapperImpl userMapper;
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @InjectMocks
     private UserService userService;
@@ -142,6 +145,7 @@ public class UserServiceTest {
         when(userMapper.toEntity(userRegistrationDto)).thenReturn(userSave);
         when(userMapper.toDto(userSave)).thenReturn(expectedResponse);
         when(userRepository.saveAndFlush(userSave)).thenReturn(userSave);
+        when(kafkaTemplate.send(anyString(), any())).thenReturn(null);
         var result = userService.createUser(userRegistrationDto);
 
         assertThat(result).isNotNull().isEqualTo(expectedResponse);
@@ -165,7 +169,6 @@ public class UserServiceTest {
                 .build();
 
         when(userRepository.existsByEmail(userRegistrationDto.getEmail())).thenReturn(true);
-
 
         var result = assertThrows(EntityAlreadyExistsException.class, () -> userService.createUser(userRegistrationDto));
 

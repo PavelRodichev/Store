@@ -9,8 +9,11 @@ import com.pavel.store.entity.*;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.mapper.mapers.OrderItemMapper;
 import com.pavel.store.mapper.mapers.OrderMapper;
+import com.pavel.store.mapper.mapers.ProductMapper;
+import com.pavel.store.mapper.mapers.UserMapper;
 import com.pavel.store.repository.OrderItemRepository;
 import com.pavel.store.repository.OrderRepository;
+import com.pavel.store.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.client.RestTemplate;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -47,13 +51,19 @@ class OrderServiceTest {
     private UserService userService;
 
     @Mock
-    private OrderItemMapper orderItemMapper;
-
-    @Mock
     private ProductService productService;
+    @Mock
+    private ProductRepository productRepository;
+    @Mock
+    private RestTemplate restTemplate;
 
     @Mock
-    private OrderItemRepository orderItemRepository;
+    private UserMapper userMapper;
+
+    @Mock
+    private ProductMapper productMapper;
+    @Mock
+    private IdempotencyService idempotencyService;
 
     @InjectMocks
     private OrderService orderService;
@@ -108,6 +118,7 @@ class OrderServiceTest {
 
     @Test
     void testCreateOrder_SuccessfulCreation() {
+        String key = "1";
         OrderCreateDto createDto = new OrderCreateDto();
         createDto.setUserId(1L);
         createDto.setShippingAddress("Some address");
@@ -140,9 +151,9 @@ class OrderServiceTest {
         when(productService.findProductById(1L)).thenReturn(product);
         when(orderRepository.save(any(Order.class))).thenReturn(order);
         when(orderMapper.toDto(any(Order.class))).thenReturn(dto);
-
-
-        OrderResponseDto result = orderService.createOrder(createDto);
+        when(idempotencyService.hasExistKey(key)).thenReturn(false);
+        when(idempotencyService.saveKeyWithOrderId(eq(key), anyLong())).thenReturn(true);
+        OrderResponseDto result = orderService.createOrder(createDto, key);
 
         assertNotNull(result);
         assertEquals(dto, result);
@@ -154,10 +165,10 @@ class OrderServiceTest {
     void testCreateOrder_UserNotFound() {
         OrderCreateDto createDto = new OrderCreateDto();
         createDto.setUserId(1L);
-
+        String key = "1";
         when(userService.findUserById(1L)).thenReturn(null);
-
-        assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(createDto));
+        when(idempotencyService.hasExistKey(key)).thenReturn(false);
+        assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(createDto, key));
     }
 
     @Test
@@ -165,14 +176,14 @@ class OrderServiceTest {
         OrderCreateDto createDto = new OrderCreateDto();
         createDto.setUserId(1L);
         createDto.setItems(Collections.singletonList(new OrderItemRequestDto(1L, 2)));
-
+        String key = "1";
         User user = new User();
         user.setId(1L);
 
         when(userService.findUserById(1L)).thenReturn(user);
         when(productService.findProductById(1L)).thenReturn(null);
 
-        assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(createDto));
+        assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(createDto, "key"));
     }
 
     @Test
@@ -180,6 +191,7 @@ class OrderServiceTest {
         OrderCreateDto createDto = new OrderCreateDto();
         createDto.setUserId(1L);
         createDto.setItems(Collections.singletonList(new OrderItemRequestDto(1L, 15)));
+        String key = "1";
 
         User user = new User();
         user.setId(1L);
@@ -191,7 +203,7 @@ class OrderServiceTest {
         when(userService.findUserById(1L)).thenReturn(user);
         when(productService.findProductById(1L)).thenReturn(product);
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(createDto));
+        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(createDto, key));
     }
 
     @Test

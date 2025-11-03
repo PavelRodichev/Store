@@ -1,10 +1,8 @@
 package com.pavel.store.service;
 
 
-import com.pavel.store.aop.MethodTime;
 import com.pavel.store.entity.CustomUserDetails;
 import com.pavel.store.events.UserRegisteredEvent;
-import com.pavel.store.handler.eventshandlers.EventHandlerDispatcher;
 import com.pavel.store.handler.exeption.EntityAlreadyExistsException;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
 import com.pavel.store.dto.request.UserRegistrationDto;
@@ -14,7 +12,8 @@ import com.pavel.store.entity.Role;
 import com.pavel.store.entity.User;
 import com.pavel.store.mapper.implMapper.UserMapperImpl;
 import com.pavel.store.repository.UserRepository;
-import jakarta.persistence.EntityManager;
+
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+
 import java.util.Optional;
 
 @Slf4j

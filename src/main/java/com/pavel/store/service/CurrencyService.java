@@ -15,7 +15,7 @@ public class CurrencyService {
 
     private final CurrencyRateClient currencyRateClient;
 
-    @Cacheable(cacheNames = "exchangeRate",unless = "#result == null")
+    @Cacheable(cacheNames = "exchangeRate", unless = "#result == null", cacheManager = "CaffeineCacheManager")
     public BigDecimal getRate() {
         log.info("🔄 CurrencyService - fetching fresh rate...");
         return currencyRateClient.getRate();

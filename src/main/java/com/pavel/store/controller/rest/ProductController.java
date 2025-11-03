@@ -32,7 +32,8 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Page<ProductResponseDto>> getAllProduct(
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 20) Pageable pageable
+            , @RequestHeader(value = "X-Currency", required = false) String currency) {
         Page<ProductResponseDto> result = productService.getAllProduct(pageable);
         return ResponseEntity.ok(result);
     }

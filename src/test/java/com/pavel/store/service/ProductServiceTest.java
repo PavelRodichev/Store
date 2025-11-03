@@ -431,7 +431,7 @@ public class ProductServiceTest {
                 createProduct(1L, "Product 1", new BigDecimal("100.00")),
                 createProduct(2L, "Product 2", new BigDecimal("200.00"))
         );
-        when(productRepository.findAll()).thenReturn(products);
+        when(productRepository.findAllWithPessimisticWrite()).thenReturn(products);
         // Act
         productService.increaseAllPrices(percent);
 
@@ -478,7 +478,7 @@ public class ProductServiceTest {
         BigDecimal percent = new BigDecimal("10.00");
 
 
-        when(productRepository.findAll()).thenReturn(Collections.EMPTY_LIST);
+        when(productRepository.findAllWithPessimisticWrite()).thenReturn(Collections.EMPTY_LIST);
 
 
         productService.increaseAllPrices(percent);

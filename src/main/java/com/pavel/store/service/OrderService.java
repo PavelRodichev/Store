@@ -43,6 +43,8 @@ public class OrderService {
     private final RestTemplate restTemplate;
     private final UserMapper userMapper;
     private final ProductMapper productMapper;
+    private final IdempotencyService idempotencyService;
+
 
     @Transactional
     public List<ProductWithOrdersResponse> getGroupingProductsByOrder() {
@@ -108,14 +110,23 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponseDto createOrder(OrderCreateDto createDto) {
+    public OrderResponseDto createOrder(OrderCreateDto createDto, String key) {
+        // валидация ключа идемпотентности
+        if (key == null && key.trim().isEmpty()) {
+            throw new IllegalArgumentException("key cannot be null");
+        }
+        // сначала ходим в кеш редис, если ключ уже есть то возвращаем существующий заказ
+        if (idempotencyService.hasExistKey(key)) {
+            log.info("key idempotency already exist in redis,returning existing order");
+            var orderId = idempotencyService.getOrderIdByKey(key);
+            return orderRepository.findById(orderId).map(orderMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Order", orderId));
+        }
         log.info("Creating order for user: {}", createDto.getUserId());
-
-
         User user = userService.findUserById(createDto.getUserId());
         if (user == null) {
             throw new EntityNotFoundException("User", createDto.getUserId());
         }
+
 
         Order saved = Order.builder()
                 .address(createDto.getShippingAddress())
@@ -144,6 +155,8 @@ public class OrderService {
         }
         saved.calculateTotalAmount();
         Order savedOrder = orderRepository.save(saved);
+        idempotencyService.saveKeyWithOrderId(key, savedOrder.getId());
+        log.info("OrderId:{} save in redis cache with key:{}", savedOrder.getId(), key);
         OrderResponseDto orderResponseDto = orderMapper.toDto(savedOrder);
         return orderResponseDto;
     }
