@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.kafka.annotation.KafkaListener;
 
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,14 +24,20 @@ public class KafkaEventConsumer {
 
 
     @KafkaListener(topics = "events", groupId = "${kafka.consumer.group-id:default-group}", containerFactory = "kafkaListenerContainerFactory")
-    public void consume(String message) {
-        System.out.println("📨 RAW MESSAGE: " + message);
+    public void consume(EventSource event) {
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
         try {
-            EventSource event = objectMapper.readValue(message, EventSource.class);
-            System.out.println("✅ Event type: " + event.getEvent());
+            SecurityContextHolder.setContext(context);
+
+            log.info("📨 Received event type: {}", event.getEvent());
+            log.info("✅ Event details: {}", event);
+
             eventHandlerDispatcher.dispatch(event);
+
         } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
+            log.error("❌ Error processing event: {}", e.getMessage(), e);
+        } finally {
+            SecurityContextHolder.clearContext();
         }
     }
 }

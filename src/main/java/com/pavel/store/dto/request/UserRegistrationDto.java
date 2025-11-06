@@ -1,6 +1,7 @@
 package com.pavel.store.dto.request;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,25 +17,31 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Schema(description = "Данные для регистрации")
 public class UserRegistrationDto {
 
+    @Schema(description = "Имя пользователя", example = "john_doe")
     @NotBlank(message = "Username is required")
     private String username;
 
+
+    @Schema(description = "Email", example = "user@example.com")
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email is required")
     private String email;
 
+    @Schema(description = "Пароль", example = "password123")
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
+    @Schema(description = "Имя", example = "John")
     @NotBlank(message = "First name is required")
     private String firstName;
 
+    @Schema(description = "Фамилия", example = "Doe")
     @NotBlank(message = "Last name is required")
     private String lastName;
-
 
 
 }

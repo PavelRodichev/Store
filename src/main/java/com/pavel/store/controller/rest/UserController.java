@@ -32,7 +32,7 @@ public class UserController {
 
 
     @Transactional
-    @PostMapping("/register")
+    @PostMapping()
     public ResponseEntity<UserResponseDto> registration(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
         var userResponse = userService.createUser(userRegistrationDto);
         return ResponseEntity.ok(userResponse);

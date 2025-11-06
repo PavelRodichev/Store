@@ -21,8 +21,8 @@ public class KafkaEventProducer {
 
         try {
             log.info("Working Kafka Producer...");
-            String messageJson = objectMapper.writeValueAsString(emailMessage);
-            kafkaTemplate.send("email-topic", emailMessage.getId(), messageJson);
+
+            kafkaTemplate.send("email-topic", emailMessage.getId(), emailMessage);
 
             log.info("message send to topic");
         } catch (Exception e) {

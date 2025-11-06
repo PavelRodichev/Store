@@ -37,7 +37,7 @@ public class MySсheduler {
             productService.increaseAllPrices(BigDecimal.valueOf(10));
             log.info(" SCHEDULER STARTED - БЛОКИРУЮ ТОВАРЫ!");
             for (int i = 1; i <= 15; i++) {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
                 log.info("SCHEDULER: Держу FOR UPDATE... {} сек", i);
             }
         } catch (InterruptedException e) {
