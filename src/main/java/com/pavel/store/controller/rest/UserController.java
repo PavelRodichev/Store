@@ -32,8 +32,9 @@ public class UserController {
 
 
     @Transactional
-    @PostMapping()
-    public ResponseEntity<UserResponseDto> registration(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponseDto> create(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
         var userResponse = userService.createUser(userRegistrationDto);
         return ResponseEntity.ok(userResponse);
 
@@ -41,6 +42,7 @@ public class UserController {
 
     @Operation(summary = "Get all users with pagination")
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageResponse<UserResponseDto>> getAllUsers(
             @PageableDefault(size = 20) Pageable pageable
     ) {
@@ -51,6 +53,7 @@ public class UserController {
 
     @Operation(summary = "Get user by username")
     @GetMapping("/username")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDto> getUserByUsername(
             @RequestParam String username
     ) {
@@ -61,6 +64,7 @@ public class UserController {
 
     @Operation(summary = "get User by id")
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
 
         return ResponseEntity.ok(userService.getUserById(id));
@@ -70,6 +74,7 @@ public class UserController {
     @Operation(summary = "delete user")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUserById(id);
     }
@@ -77,6 +82,7 @@ public class UserController {
     @Transactional
     @PutMapping("/{id}")
     @Operation(summary = "delete user")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDto> updateUser(@RequestBody @Valid UserUpdateDto updateDto, @PathVariable Long id) {
 
         return ResponseEntity.ok(userService.updateUser(updateDto, id));

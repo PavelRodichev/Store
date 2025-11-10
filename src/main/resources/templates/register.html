@@ -35,6 +35,23 @@
                             <label for="password" class="form-label">Пароль:</label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
+                        <div class="mb-3">
+                            <h5>Выберите роль:</h5>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="role" id="roleUser" value="USER"
+                                       checked>
+                                <label class="form-check-label" for="roleUser">
+                                    👤 Пользователь
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="role" id="roleAdmin"
+                                       value="ADMIN">
+                                <label class="form-check-label" for="roleAdmin">
+                                    ⚡ Администратор
+                                </label>
+                            </div>
+                        </div>
                         <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
                     </form>
 
@@ -53,15 +70,18 @@
 </div>
 
 <script>
-    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    document.getElementById('registerForm').addEventListener('submit', async function (e) {
         e.preventDefault();
+
+        const selectedRole = document.querySelector('input[name="role"]:checked').value;
 
         const formData = {
             email: document.getElementById('email').value,
             username: document.getElementById('username').value,
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
-            password: document.getElementById('password').value
+            password: document.getElementById('password').value,
+            role: selectedRole
         };
 
         try {

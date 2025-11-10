@@ -32,7 +32,7 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderCreateDto request,
-                                                        @RequestHeader(value = "Idempotency-Key", required = false) String key) {
+                                                        @RequestHeader(value = "Idempotency-Key") String key) {
         log.info("Received request to create order for user: {}", request.getUserId());
         OrderResponseDto order = orderService.createOrder(request, key);
         return ResponseEntity.status(HttpStatus.CREATED).body(order);

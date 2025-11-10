@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class    CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 

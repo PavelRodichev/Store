@@ -66,7 +66,7 @@ public class UserService {
         }
 
         User userSave = userMapper.toEntity(userRegistrationDto);
-        userSave.setRole(Role.USER);
+        userSave.setRole(Role.valueOf(userRegistrationDto.getRole()));
 
         log.info("User created");
 

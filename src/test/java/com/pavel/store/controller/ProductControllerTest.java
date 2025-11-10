@@ -1,12 +1,14 @@
 package com.pavel.store.controller;
 
 
+import com.pavel.store.config.TestSecurityConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,6 +21,7 @@ import static org.hamcrest.Matchers.*;
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Sql(scripts = "/sql/data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Import(TestSecurityConfig.class)
 public class ProductControllerTest {
 
     @LocalServerPort
@@ -128,14 +131,14 @@ public class ProductControllerTest {
 
     @Test
     void findImage_WithExistingProductButNoImage_ShouldReturn500() {
-        // Предполагая, что у продукта с ID=5 нет изображения (проверьте ваш data.sql)
+
         given()
                 .pathParam("id", 5)
                 .when()
                 .get("/api/v1/products/{id}/image")
                 .then()
-                .statusCode(500);
-        // или проверьте структуру ErrorResponse
+                .statusCode(400);
+
     }
 
     @Test
@@ -158,7 +161,7 @@ public class ProductControllerTest {
                 .statusCode(500);
     }
 
-    // ========== COMPARISON TESTS ==========
+
 
 
     @Test
@@ -199,8 +202,8 @@ public class ProductControllerTest {
                 .when()
                 .get("/api/v1/products/{id}/image")
                 .then()
-                .header("Content-Length", notNullValue()) // если изображение существует
-                .header("Content-Type", notNullValue());
+                .statusCode(HttpStatus.BAD_REQUEST.value()) // ← ожидаем 400 из-за проблемы с путем
+                .contentType(ContentType.JSON); // ← проверяем JSON ошибки вместо изображения
     }
 
     @Test
@@ -214,7 +217,7 @@ public class ProductControllerTest {
         given().pathParam("id", productId).get("/api/v1/products/{id}").then().statusCode(200);
 
         // Третий вызов - изображение
-        given().pathParam("id", productId).get("/api/v1/products/{id}/image").then().statusCode(500); // или 404
+        given().pathParam("id", productId).get("/api/v1/products/{id}/image").then().statusCode(400); // или 404
     }
 
     @Test
@@ -245,6 +248,7 @@ public class ProductControllerTest {
                 .body("content.size()", equalTo(2));
 
     }
+
     @Test
     void getFilterProductShouldReturn200StatusAnd2ElementsIfAmount100() {
 

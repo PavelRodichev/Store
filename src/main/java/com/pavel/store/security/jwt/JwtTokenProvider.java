@@ -28,7 +28,6 @@ public class JwtTokenProvider {
 
         // устанавливаем срок действия JWT токена
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
-
         return Jwts.builder()
                 .setSubject(Long.toString(userPrincipal.getId()))
                 .setIssuedAt(new Date())

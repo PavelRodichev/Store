@@ -9,9 +9,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -21,6 +23,7 @@ import java.io.IOException;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private JwtTokenProvider jwtTokenProvider;
@@ -29,44 +32,82 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("=== JWT FILTER START: {} {} ===", request.getMethod(), request.getRequestURI());
 
         String path = request.getServletPath();
-        if (path.startsWith("/api/auth/") ||
-            path.startsWith("/actuator/") ||
-            path.contains("kafka")) {
+
+        //  Расширяем список публичных endpoints
+        if (isPublicPath(path)) {
+            log.info("Skipping JWT filter for public path: {}", path);
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
             String jwt = getJwtFromRequest(request);
+            log.info("JWT token found: {}", jwt != null);
 
-            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateJwtToken(jwt)) {
+            if (StringUtils.hasText(jwt)) {
+                log.info("Validating JWT token...");
 
-                Long userId = jwtTokenProvider.getUserIdFromJWT(jwt);
+                //  Сначала проверяем валидность токена
+                if (jwtTokenProvider.validateJwtToken(jwt)) {
+                    Long userId = jwtTokenProvider.getUserIdFromJWT(jwt);
+                    log.info("JWT token valid for user ID: {}", userId);
 
-                UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+                    //  Загружаем пользователя
+                    UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+                    log.info("User loaded: {}", userDetails.getUsername());
 
-                // здесь создаем обьект аутентификации с данными пользователя
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null, userDetails.getAuthorities());
 
-                //Здесь мы добавляем к обьекту аутентификации дополнительную мета информацию из сессии и HTTP запроса
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    // Создаем аутентификацию
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.info("Authentication set in SecurityContext for user: {}", userDetails.getUsername());
 
+                } else {
+                    log.warn("JWT token validation failed for path: {}", path);
+                }
+            } else {
+                log.warn("No JWT token found for protected path: {}", path);
             }
+        } catch (UsernameNotFoundException e) {
+            // ПОЛЬЗОВАТЕЛЬ УДАЛЕН - ОЧИЩАЕМ КОНТЕКСТ
+            log.warn("User not found: {}. Clearing security context.", e.getMessage());
+            SecurityContextHolder.clearContext();
+
+            // Удаляем невалидный токен из cookie
+            clearInvalidTokenCookie(response);
 
         } catch (Exception e) {
-            logger.error("Could not set user authentication in security context" + e);
+            log.error("JWT Authentication failed: {}", e.getMessage(), e);
         }
 
+        log.info("=== JWT FILTER END ===");
         filterChain.doFilter(request, response);
 
     }
 
+    private void clearInvalidTokenCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("JWT", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0); // Удалить cookie
+        response.addCookie(cookie);
+    }
+
+    private boolean isPublicPath(String path) {
+        return path.startsWith("/api/auth/") ||
+               path.startsWith("/actuator/") ||
+               path.startsWith("/v3/api-docs") ||
+               path.startsWith("/swagger-ui") ||
+               path.contains("kafka") ||
+               path.startsWith("/api/v1/products/") ||
+               path.startsWith("/api/v1/categories/");
+    }
 
     private String getJwtFromRequest(HttpServletRequest request) {
         // 1. Проверяем заголовок Authorization (для REST API)
@@ -85,7 +126,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // 3. Проверяем параметр запроса (опционально)
+        // 3. Проверяем параметр запроса
         String tokenParam = request.getParameter("token");
         if (StringUtils.hasText(tokenParam)) {
             return tokenParam;

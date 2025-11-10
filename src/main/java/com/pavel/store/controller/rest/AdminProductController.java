@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,17 +20,23 @@ public class AdminProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody @Valid ProductCreateDto productDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.saveProduct(productDto));
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductResponseDto> createProduct(
+            @RequestBody @Valid ProductCreateDto productDto) {
+        System.out.println();
+        var product = productService.saveProduct(productDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProductById(@PathVariable Long id) {
         productService.deleteProductById(id);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponseDto> updateProduct(@RequestBody @Valid ProductUpdateDto productUpdateDto, @PathVariable Long id) {
         return ResponseEntity.ok(productService.updateProduct(productUpdateDto, id));
     }

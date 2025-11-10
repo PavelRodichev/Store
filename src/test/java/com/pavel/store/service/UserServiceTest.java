@@ -136,6 +136,7 @@ public class UserServiceTest {
                 .lastName("Doe")
                 .firstName("John")
                 .email("test@example.com")
+                .role("USER")
                 .build();
         User userSave = createValidUser();
         UserResponseDto expectedResponse = createUserResponseDto();
@@ -145,7 +146,6 @@ public class UserServiceTest {
         when(userMapper.toEntity(userRegistrationDto)).thenReturn(userSave);
         when(userMapper.toDto(userSave)).thenReturn(expectedResponse);
         when(userRepository.saveAndFlush(userSave)).thenReturn(userSave);
-        when(kafkaTemplate.send(anyString(), any())).thenReturn(null);
         var result = userService.createUser(userRegistrationDto);
 
         assertThat(result).isNotNull().isEqualTo(expectedResponse);

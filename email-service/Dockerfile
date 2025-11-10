@@ -3,7 +3,7 @@ FROM ghcr.io/graalvm/graalvm-ce:java17-21.3.0
 WORKDIR /app
 
 # Копируем JAR файл
-COPY target/*.jar app.jar
+COPY target/email-service-0.0.1-SNAPSHOT.jar app.jar
 
 # Указываем порт
 EXPOSE 8085

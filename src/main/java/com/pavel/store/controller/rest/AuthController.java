@@ -75,13 +75,22 @@ public class AuthController {
             return ResponseEntity.badRequest().body("User with that email already exist");
         }
 
+        Role userRole;
+        try {
+            userRole = (userRegistrationDto.getRole() != null && !userRegistrationDto.getRole().isEmpty())
+                    ? Role.valueOf(userRegistrationDto.getRole().toUpperCase())
+                    : Role.USER; // значение по умолчанию
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid role: " + userRegistrationDto.getRole());
+        }
+
         User user = User.builder()
                 .email(userRegistrationDto.getEmail())
                 .username(userRegistrationDto.getUsername())
                 .lastName(userRegistrationDto.getLastName())
                 .firstName(userRegistrationDto.getFirstName())
                 .password(passwordEncoder.encode(userRegistrationDto.getPassword()))
-                .role(Role.USER)
+                .role(userRole)
                 .build();
 
         User result = userRepository.save(user);

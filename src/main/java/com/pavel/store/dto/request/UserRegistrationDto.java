@@ -43,5 +43,8 @@ public class UserRegistrationDto {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
+    @Schema(description = "Роль", example = "ADMIN")
+    @NotBlank(message = "Role is required")
+    private String role;
 
 }
