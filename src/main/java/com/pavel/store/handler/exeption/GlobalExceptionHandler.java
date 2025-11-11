@@ -92,4 +92,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(EmptyListException.class)
+    public ResponseEntity<ErrorDetails> handleEmptyListException(EmptyListException ex) {
+        log.error("Empty list detected: {}", ex.getMessage());
+
+        ErrorDetails errorDetails = new ErrorDetails(ex.getClass().getSimpleName(), ex.getMessage());
+
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
 }

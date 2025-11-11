@@ -208,7 +208,7 @@ public class OrderControllerTest {
                 .when()
                 .post("/api/v1/orders")
                 .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test

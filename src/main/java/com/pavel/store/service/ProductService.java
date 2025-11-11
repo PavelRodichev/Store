@@ -7,6 +7,7 @@ import com.pavel.store.dto.request.ProductFilterDto;
 import com.pavel.store.dto.request.ProductUpdateDto;
 import com.pavel.store.dto.response.ProductResponseDto;
 import com.pavel.store.entity.Product;
+import com.pavel.store.handler.exeption.EmptyListException;
 import com.pavel.store.mapper.implMapper.ProductMapperImpl;
 import com.pavel.store.repository.ProductRepository;
 import com.pavel.store.handler.exeption.EntityNotFoundException;
@@ -71,7 +72,7 @@ public class ProductService {
     public List<Product> getProductByIdWithLock(List<Long> ids) {
         List<Product> productList = productRepository.findAllByIdsWithLock(ids);
         if (productList.isEmpty() || productList == null) {
-            throw new RuntimeException("List products is empty or null");
+            throw new EmptyListException("Product");
         }
         return productList;
     }
@@ -116,6 +117,7 @@ public class ProductService {
 
     }
 
+    @MethodTime
     @Transactional
     public void deleteProductById(Long id) {
         if (productRepository.existsById(id)) {
