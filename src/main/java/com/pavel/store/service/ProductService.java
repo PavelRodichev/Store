@@ -67,6 +67,16 @@ public class ProductService {
     }
 
     @MethodTime
+    @Transactional
+    public List<Product> getProductByIdWithLock(List<Long> ids) {
+        List<Product> productList = productRepository.findAllByIdsWithLock(ids);
+        if (productList.isEmpty() || productList == null) {
+            throw new RuntimeException("List products is empty or null");
+        }
+        return productList;
+    }
+
+    @MethodTime
     @Transactional(readOnly = true)
     public Product findProductById(Long id) {
         return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product", id));

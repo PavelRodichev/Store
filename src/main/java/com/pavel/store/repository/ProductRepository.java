@@ -47,4 +47,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @EntityGraph(attributePaths = {"category"})
     Page<Product> findAll(Specification<Product> specification, Pageable pageable);
 
+    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Product p WHERE p.id IN :ids")
+    List<Product> findAllByIdsWithLock(@Param("ids") List<Long> id);
+
 }

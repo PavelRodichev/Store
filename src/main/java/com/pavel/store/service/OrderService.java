@@ -28,6 +28,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -112,7 +113,7 @@ public class OrderService {
     @Transactional
     public OrderResponseDto createOrder(OrderCreateDto createDto, String key) {
         // валидация ключа идемпотентности
-        if (key == null && key.trim().isEmpty()) {
+        if (key == null || key.trim().isEmpty()) {
             throw new IllegalArgumentException("key cannot be null");
         }
         // сначала ходим в кеш редис, если ключ уже есть то возвращаем существующий заказ
@@ -136,28 +137,44 @@ public class OrderService {
 
         log.info("Order status after building: {}", saved.getOrderStatus());
 
-        for (OrderItemRequestDto items : createDto.getItems()) {
-            Product product = productService.findProductById(items.getProductId());
+        // id товаров которые есть в заказе
+        List<Long> lockedProducts = createDto.getItems().stream().map(OrderItemRequestDto::getProductId).toList();
+
+        // блокируем товары и добовляем в мапу с ключом от товара
+        Map<Long, Product> productMap = productService.getProductByIdWithLock(lockedProducts)
+                .stream().collect(Collectors.toMap(Product::getId, Function.identity()));
+
+        // проходим циклом по List<OrderItemRequestDto> из createDto
+        for (OrderItemRequestDto itemRequestDto : createDto.getItems()) {
+
+            // находим залоченный продукт из OrderItemRequestDto в мапе
+            Product product = productMap.get(itemRequestDto.getProductId());
             if (product == null) {
-                throw new EntityNotFoundException("Product", items.getProductId());
+                throw new EntityNotFoundException("Product", itemRequestDto.getProductId());
             }
-            OrderItem orderItem = getBuild(items, saved, product);
+            // билдим OrderItem через метод getBuild
+            OrderItem orderItem = getBuild(itemRequestDto, saved, product);
 
 //проверяем кол-во продуктов
-            if (product.getAmount() > 0 && product.getAmount() >= orderItem.getQuantity()) {
-                product.setAmount(product.getAmount() - orderItem.getQuantity());
+            if (product.getAmount() >= itemRequestDto.getQuantity() && itemRequestDto.getQuantity() > 0) {
+                product.setAmount(product.getAmount() - itemRequestDto.getQuantity());
             } else {
                 throw new IllegalArgumentException("the product quantity must be > 0");
             }
 
+            // добавляем в заказ OrderItem
             saved.getItems().add(orderItem);
 
         }
         saved.calculateTotalAmount();
+
         Order savedOrder = orderRepository.save(saved);
+
         idempotencyService.saveKeyWithOrderId(key, savedOrder.getId());
+
         log.info("OrderId:{} save in redis cache with key:{}", savedOrder.getId(), key);
         OrderResponseDto orderResponseDto = orderMapper.toDto(savedOrder);
+
         return orderResponseDto;
     }
 
