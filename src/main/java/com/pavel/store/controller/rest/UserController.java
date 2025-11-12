@@ -34,6 +34,7 @@ public class UserController {
     @Transactional
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create User")
     public ResponseEntity<UserResponseDto> create(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
         var userResponse = userService.createUser(userRegistrationDto);
         return ResponseEntity.ok(userResponse);

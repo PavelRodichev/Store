@@ -1,6 +1,7 @@
 package com.pavel.store.config;
 
 import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -19,12 +20,14 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("My REST API")
+                        .title("Store API")
                         .version("1.0")
-                        .description("API documentation")
+                        .description("E-commerce Store Application API")
                         .contact(new Contact()
-                                .name("Support")
-                                .email("support@example.com")))
+                                .name("Pavel")
+                                .email("nukedevil01@gmail.com"))).externalDocs(new ExternalDocumentation()
+                        .description("Store Documentation")
+                        .url("https://github.com/PavelRodichev/Store"))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme()
