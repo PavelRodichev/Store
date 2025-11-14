@@ -147,18 +147,21 @@ class OrderServiceTest {
         OrderResponseDto dto = new OrderResponseDto();
         dto.setId(1L);
 
+
         when(userService.findUserById(1L)).thenReturn(user);
-        when(productService.findProductById(1L)).thenReturn(product);
+        when(productService.getProductByIdWithLock(anyList())).thenReturn(Collections.singletonList(product)); // Исправлено!
         when(orderRepository.save(any(Order.class))).thenReturn(order);
         when(orderMapper.toDto(any(Order.class))).thenReturn(dto);
         when(idempotencyService.hasExistKey(key)).thenReturn(false);
         when(idempotencyService.saveKeyWithOrderId(eq(key), anyLong())).thenReturn(true);
+
         OrderResponseDto result = orderService.createOrder(createDto, key);
 
         assertNotNull(result);
         assertEquals(dto, result);
 
         verify(orderRepository).save(any(Order.class));
+        verify(productService).getProductByIdWithLock(anyList()); // Добавьте эту проверку
     }
 
     @Test
@@ -173,37 +176,68 @@ class OrderServiceTest {
 
     @Test
     void testCreateOrder_ProductNotFound() {
+        // Given
         OrderCreateDto createDto = new OrderCreateDto();
         createDto.setUserId(1L);
         createDto.setItems(Collections.singletonList(new OrderItemRequestDto(1L, 2)));
-        String key = "1";
+        createDto.setShippingAddress("Test Address"); // Добавьте если есть в DTO
+        String key = "valid-test-key";
+
         User user = new User();
         user.setId(1L);
 
-        when(userService.findUserById(1L)).thenReturn(user);
-        when(productService.findProductById(1L)).thenReturn(null);
 
-        assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(createDto, "key"));
+        when(userService.findUserById(1L)).thenReturn(user);
+        when(productService.getProductByIdWithLock(anyList())).thenReturn(Collections.emptyList()); // Продукт не найден
+        when(idempotencyService.hasExistKey(key)).thenReturn(false);
+
+        // When & Then
+        assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(createDto, key));
+
+        // Проверяем вызовы
+        verify(userService).findUserById(1L);
+        verify(productService).getProductByIdWithLock(anyList());
     }
 
     @Test
     void testCreateOrder_InsufficientStock() {
+        // Given
         OrderCreateDto createDto = new OrderCreateDto();
         createDto.setUserId(1L);
         createDto.setItems(Collections.singletonList(new OrderItemRequestDto(1L, 15)));
-        String key = "1";
+        createDto.setShippingAddress("Test Address"); // Добавьте это поле если оно есть в DTO
+        String key = "valid-test-key-123"; // Важный: ключ не должен быть null или пустым
 
         User user = new User();
         user.setId(1L);
 
         Product product = new Product();
         product.setId(1L);
-        product.setAmount(10);
+        product.setAmount(10); // Доступно 10, запрашивается 15
+        product.setPrice(BigDecimal.valueOf(100)); // Добавьте обязательные поля
+        product.setName("Test Product");
+        product.setArticle("TEST123");
+
 
         when(userService.findUserById(1L)).thenReturn(user);
-        when(productService.findProductById(1L)).thenReturn(product);
+        when(productService.getProductByIdWithLock(anyList())).thenReturn(Collections.singletonList(product));
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(createDto, key));
+
+        when(idempotencyService.hasExistKey(key)).thenReturn(false);
+
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(createDto, key)
+        );
+
+        assertTrue(exception.getMessage().contains("the product quantity must be > 0"));
+
+
+        verify(userService).findUserById(1L);
+        verify(productService).getProductByIdWithLock(anyList());
+        verify(idempotencyService).hasExistKey(key);
+        verify(orderRepository, never()).save(any(Order.class));
     }
 
     @Test

@@ -21,7 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
+
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -48,7 +48,6 @@ public class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
-    // Вспомогательные методы
     private Product createProduct(Long id, String name, BigDecimal price) {
         return Product.builder()
                 .id(id)
@@ -117,7 +116,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should return product when exists")
     void getProductById_WhenProductExists_ShouldReturnProduct() {
-        // Arrange
+
         Long productId = 1L;
         Product product = createProduct(productId, "Test Product", new BigDecimal("99.99"));
         ProductResponseDto expectedDto = createProductResponseDto(productId, "Test Product", new BigDecimal("99.99"));
@@ -125,10 +124,9 @@ public class ProductServiceTest {
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(productMapper.toDto(product)).thenReturn(expectedDto);
 
-        // Act
         ProductResponseDto result = productService.getProductById(productId);
 
-        // Assert
+
         assertThat(result).isEqualTo(expectedDto);
         verify(productRepository).findById(productId);
         verify(productMapper).toDto(product);
@@ -137,11 +135,9 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should throw exception when product not found by ID")
     void getProductById_WhenProductNotExists_ShouldThrowException() {
-        // Arrange
         Long productId = 999L;
         when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(EntityNotFoundException.class,
                 () -> productService.getProductById(productId));
 
@@ -152,16 +148,14 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should return product entity when exists")
     void findProductById_WhenProductExists_ShouldReturnProduct() {
-        // Arrange
         Long productId = 1L;
         Product expectedProduct = createProduct(productId, "Test Product", new BigDecimal("99.99"));
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(expectedProduct));
 
-        // Act
+
         Product result = productService.findProductById(productId);
 
-        // Assert
         assertThat(result).isEqualTo(expectedProduct);
         verify(productRepository).findById(productId);
     }
@@ -169,11 +163,9 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should throw exception when product entity not found")
     void findProductById_WhenProductNotExists_ShouldThrowException() {
-        // Arrange
         Long productId = 999L;
         when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(EntityNotFoundException.class,
                 () -> productService.findProductById(productId));
 
@@ -183,7 +175,6 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should return product by name when exists")
     void getProductByName_WhenProductExists_ShouldReturnProduct() {
-        // Arrange
         String productName = "Test Product";
         Product product = createProduct(1L, productName, new BigDecimal("99.99"));
         ProductResponseDto expectedDto = createProductResponseDto(1L, productName, new BigDecimal("99.99"));
@@ -191,10 +182,8 @@ public class ProductServiceTest {
         when(productRepository.findByName(productName)).thenReturn(Optional.of(product));
         when(productMapper.toDto(product)).thenReturn(expectedDto);
 
-        // Act
         ProductResponseDto result = productService.getProductByName(productName);
 
-        // Assert
         assertThat(result).isEqualTo(expectedDto);
         verify(productRepository).findByName(productName);
         verify(productMapper).toDto(product);
@@ -203,11 +192,10 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should throw exception when product not found by name")
     void getProductByName_WhenProductNotExists_ShouldThrowException() {
-        // Arrange
+
         String productName = "Non-existent Product";
         when(productRepository.findByName(productName)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(EntityNotFoundException.class,
                 () -> productService.getProductByName(productName));
 
@@ -218,7 +206,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should return image when product has image")
     void getImage_WhenProductHasImage_ShouldReturnImage() {
-        // Arrange
+
         Long productId = 1L;
         Product product = createProduct(productId, "Test Product", new BigDecimal("99.99"));
         product.setImage("image.jpg");
@@ -227,10 +215,9 @@ public class ProductServiceTest {
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(imageService.get("image.jpg")).thenReturn(Optional.of(imageData));
 
-        // Act
+
         Optional<byte[]> result = productService.getImage(productId);
 
-        // Assert
         assertThat(result).isPresent().contains(imageData);
         verify(productRepository).findById(productId);
         verify(imageService).get("image.jpg");
@@ -239,17 +226,15 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should return empty when product has no image")
     void getImage_WhenProductHasNoImage_ShouldReturnEmpty() {
-        // Arrange
+
         Long productId = 1L;
         Product product = createProduct(productId, "Test Product", new BigDecimal("99.99"));
-        // image is null
+
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 
-        // Act
         Optional<byte[]> result = productService.getImage(productId);
 
-        // Assert
         assertThat(result).isEmpty();
         verify(productRepository).findById(productId);
         verifyNoInteractions(imageService);
@@ -258,14 +243,14 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should return empty when product not found")
     void getImage_WhenProductNotExists_ShouldReturnEmpty() {
-        // Arrange
+
         Long productId = 999L;
         when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
-        // Act
+
         Optional<byte[]> result = productService.getImage(productId);
 
-        // Assert
+
         assertThat(result).isEmpty();
         verify(productRepository).findById(productId);
         verifyNoInteractions(imageService);
@@ -274,7 +259,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should save product without image")
     void saveProduct_WithoutImage_ShouldSaveProduct() {
-        // Arrange
+
         ProductCreateDto createDto = createProductCreateDto("New Product", new BigDecimal("150.00"));
         Product productEntity = createProduct(null, "New Product", new BigDecimal("150.00"));
         Product savedProduct = createProduct(1L, "New Product", new BigDecimal("150.00"));
@@ -284,10 +269,10 @@ public class ProductServiceTest {
         when(productRepository.save(productEntity)).thenReturn(savedProduct);
         when(productMapper.toDto(savedProduct)).thenReturn(expectedDto);
 
-        // Act
+
         ProductResponseDto result = productService.saveProduct(createDto);
 
-        // Assert
+
         assertThat(result).isEqualTo(expectedDto);
         verify(productMapper).toEntity(createDto);
         verify(productRepository).save(productEntity);
@@ -299,7 +284,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should save product with image")
     void saveProduct_WithImage_ShouldSaveProductAndUploadImage() {
-        // Arrange
+
         MultipartFile image = mock(MultipartFile.class);
         ProductCreateDto createDto = ProductCreateDto.builder()
                 .name("New Product")
@@ -318,10 +303,10 @@ public class ProductServiceTest {
         when(productRepository.save(productEntity)).thenReturn(savedProduct);
         when(productMapper.toDto(savedProduct)).thenReturn(expectedDto);
 
-        // Act
+
         ProductResponseDto result = productService.saveProduct(createDto);
 
-        // Assert
+
         assertThat(result).isEqualTo(expectedDto);
         verify(imageService).upload(eq("product.jpg"), any(InputStream.class));
         verify(productMapper).toEntity(createDto);
@@ -332,14 +317,14 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should delete product when exists")
     void deleteProductById_WhenProductExists_ShouldDeleteProduct() {
-        // Arrange
+
         Long productId = 1L;
         when(productRepository.existsById(productId)).thenReturn(true);
 
-        // Act
+
         productService.deleteProductById(productId);
 
-        // Assert
+
         verify(productRepository).existsById(productId);
         verify(productRepository).deleteById(productId);
     }
@@ -347,11 +332,11 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should throw exception when deleting non-existent product")
     void deleteProductById_WhenProductNotExists_ShouldThrowException() {
-        // Arrange
+
         Long productId = 999L;
         when(productRepository.existsById(productId)).thenReturn(false);
 
-        // Act & Assert
+
         assertThrows(EntityNotFoundException.class,
                 () -> productService.deleteProductById(productId));
 
@@ -374,10 +359,10 @@ public class ProductServiceTest {
         when(productRepository.save(existingProduct)).thenReturn(updatedProduct);
         when(productMapper.toDto(updatedProduct)).thenReturn(expectedDto);
 
-        // Act
+
         ProductResponseDto result = productService.updateProduct(updateDto, productId);
 
-        // Assert
+
         assertThat(result).isEqualTo(expectedDto);
         verify(productRepository).findByIdForUpdate(productId);
         verify(productMapper).updateEntity(updateDto, existingProduct);
@@ -411,10 +396,10 @@ public class ProductServiceTest {
         when(productRepository.save(existingProduct)).thenReturn(updatedProduct);
         when(productMapper.toDto(updatedProduct)).thenReturn(expectedDto);
 
-        // Act
+
         ProductResponseDto result = productService.updateProduct(updateDto, productId);
 
-        // Assert
+
         assertThat(result).isEqualTo(expectedDto);
         verify(imageService).upload(eq("updated.jpg"), any(InputStream.class));
         verify(productMapper).updateEntity(updateDto, existingProduct);
@@ -424,7 +409,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Should increase all prices with valid percentage")
     void increaseAllPrices_WithValidPercentage_ShouldUpdatePrices() {
-        // Arrange
+
         BigDecimal percent = new BigDecimal("10.00");
         BigDecimal multiplier = new BigDecimal("1.1000");
         List<Product> products = List.of(
@@ -432,17 +417,17 @@ public class ProductServiceTest {
                 createProduct(2L, "Product 2", new BigDecimal("200.00"))
         );
         when(productRepository.findAllWithPessimisticWrite()).thenReturn(products);
-        // Act
+
         productService.increaseAllPrices(percent);
 
-        // Assert
+
         verify(productRepository).updateAllPrices(multiplier);
     }
 
     @Test
     @DisplayName("Should throw exception when percentage is null")
     void increaseAllPrices_WhenPercentageIsNull_ShouldThrowException() {
-        // Act & Assert
+
         assertThrows(IllegalArgumentException.class,
                 () -> productService.increaseAllPrices(null));
 
@@ -454,9 +439,8 @@ public class ProductServiceTest {
     void increaseAllPrices_WhenPercentageIsZero_ShouldThrowException() {
         BigDecimal zero = BigDecimal.ZERO;
 
-        // НЕ настраиваем products - пустой список по умолчанию
 
-        // Act & Assert
+
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> productService.increaseAllPrices(zero)

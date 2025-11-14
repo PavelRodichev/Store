@@ -33,7 +33,7 @@ public class AdminProductController {
     @LocalServerPort
     private int port;
 
-    private String adminToken;
+
 
     @Mock
     private AuthController authController;

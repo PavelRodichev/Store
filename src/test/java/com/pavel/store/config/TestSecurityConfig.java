@@ -22,7 +22,7 @@ public class TestSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .anyRequest().permitAll() // Разрешаем все запросы в тестах
+                        .anyRequest().permitAll()
                 );
 
         return http.build();

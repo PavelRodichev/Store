@@ -53,7 +53,7 @@ public class ProductMapperImpl implements ProductMapper {
         if (productCreateDto == null) {
             throw new IllegalArgumentException("ProductDto is null");
         }
-        Category category = categoryRepository.findByName(productCreateDto.getCategoryName()).orElseThrow(() -> new EntityNotFoundException("Product"));
+        Category category = categoryRepository.findByName(productCreateDto.getCategoryName()).orElseThrow(() -> new EntityNotFoundException("Category"));
 
         Product newProduct = Product.builder()
                 .name(productCreateDto.getName())

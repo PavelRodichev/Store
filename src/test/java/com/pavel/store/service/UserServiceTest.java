@@ -200,14 +200,14 @@ public class UserServiceTest {
 
     @Test
     void deleteUserById_WhenUserExists_ShouldDeleteUser() {
-        // Arrange
+
         Long userId = 1L;
         when(userRepository.existsById(userId)).thenReturn(true);
 
-        // Act
+
         userService.deleteUserById(userId);
 
-        // Assert
+
         verify(userRepository).existsById(userId);
         verify(userRepository).deleteById(userId);
         verifyNoMoreInteractions(userRepository);
@@ -231,10 +231,10 @@ public class UserServiceTest {
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
 
 
-        // Act
+
         UserResponseDto result = userService.updateUser(updateDto, userId);
 
-        // Assert
+
 
 
         verify(userMapper).updateEntity(eq(updateDto), userArgumentCaptor.capture());
@@ -242,7 +242,7 @@ public class UserServiceTest {
 
         assertThat(capturedUser).isNotNull().isSameAs(existingUser);
         assertThat(result).isEqualTo(expectedResponse);
-        // Verify interactions
+
         verify(userRepository).findById(userId);
         verify(userMapper).updateEntity(updateDto, existingUser);
         verify(userMapper).toDto(existingUser);

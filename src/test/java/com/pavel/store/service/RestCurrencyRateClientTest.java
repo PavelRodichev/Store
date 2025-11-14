@@ -51,7 +51,7 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenServiceReturnsSuccess_ShouldReturnRateFromService() {
-        // Arrange
+
         String currency = "EUR";
         Double expectedRate = 0.85;
         Map<String, Object> responseBody = new HashMap<>();
@@ -61,10 +61,10 @@ class RestCurrencyRateClientTest {
         when(sessionCurrency.getCurrency()).thenReturn(currency);
         when(restTemplate.getForEntity(currencyServiceUrl, Map.class)).thenReturn(responseEntity);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.valueOf(expectedRate), result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verify(sessionCurrency, atLeastOnce()).getCurrency();
@@ -73,7 +73,7 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenServiceFails_ShouldReturnRateFromFile() {
-        // Arrange
+
         String currency = "EUR";
         Double expectedRate = 0.86;
         Map<Object, Object> fileRates = new HashMap<>();
@@ -84,10 +84,10 @@ class RestCurrencyRateClientTest {
                 .thenThrow(new RestClientException("Service unavailable"));
         when(exchangeRateProvider.getExchangeRate()).thenReturn(fileRates);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.valueOf(expectedRate), result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verify(exchangeRateProvider).getExchangeRate();
@@ -96,17 +96,17 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenServiceReturnsEmptyBody_ShouldReturnDefaultRate() {
-        // Arrange
+
         String currency = "EUR";
         ResponseEntity<Map> responseEntity = new ResponseEntity<>(new HashMap<>(), HttpStatus.OK);
 
         when(sessionCurrency.getCurrency()).thenReturn(currency);
         when(restTemplate.getForEntity(currencyServiceUrl, Map.class)).thenReturn(responseEntity);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.ONE, result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verifyNoInteractions(exchangeRateProvider); // Fallback на файл не должен вызываться
@@ -114,7 +114,7 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenServiceReturnsWrongCurrency_ShouldReturnDefaultRate() {
-        // Arrange
+
         String requestedCurrency = "EUR";
         String availableCurrency = "USD";
         Map<String, Object> responseBody = new HashMap<>();
@@ -124,25 +124,25 @@ class RestCurrencyRateClientTest {
         when(sessionCurrency.getCurrency()).thenReturn(requestedCurrency);
         when(restTemplate.getForEntity(currencyServiceUrl, Map.class)).thenReturn(responseEntity);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.ONE, result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verifyNoInteractions(exchangeRateProvider); // Убрана неиспользуемая заглушка
     }
     @Test
     void getRate_WhenBothServiceAndFileFail_ShouldReturnDefaultRate() {
-        // Arrange
+
         when(restTemplate.getForEntity(currencyServiceUrl, Map.class))
                 .thenThrow(new RestClientException("Service unavailable"));
         when(exchangeRateProvider.getExchangeRate()).thenReturn(new HashMap<>());
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.ONE, result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verify(exchangeRateProvider).getExchangeRate();
@@ -151,7 +151,7 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenServiceReturnsNonDoubleRate_ShouldReturnDefaultRate() {
-        // Arrange
+
         String currency = "EUR";
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put(currency, "invalid-rate");
@@ -160,10 +160,10 @@ class RestCurrencyRateClientTest {
         when(sessionCurrency.getCurrency()).thenReturn(currency);
         when(restTemplate.getForEntity(currencyServiceUrl, Map.class)).thenReturn(responseEntity);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.ONE, result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verifyNoInteractions(exchangeRateProvider);
@@ -171,7 +171,7 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenFileReturnsNonDoubleRate_ShouldReturnDefaultRate() {
-        // Arrange
+
         String currency = "EUR";
         Map<Object, Object> fileRates = new HashMap<>();
         fileRates.put(currency, "invalid-rate");
@@ -181,10 +181,10 @@ class RestCurrencyRateClientTest {
                 .thenThrow(new RestClientException("Service unavailable"));
         when(exchangeRateProvider.getExchangeRate()).thenReturn(fileRates);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.ONE, result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verify(exchangeRateProvider).getExchangeRate();
@@ -192,18 +192,17 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenServiceReturnsHttpError_ShouldReturnRateFromFile() {
-        // Arrange
-        // Arrange
+
         String currency = "EUR";
         ResponseEntity<Map> responseEntity = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
         when(sessionCurrency.getCurrency()).thenReturn(currency);
         when(restTemplate.getForEntity(currencyServiceUrl, Map.class)).thenReturn(responseEntity);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.ONE, result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verifyNoInteractions(exchangeRateProvider);
@@ -211,7 +210,6 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenServiceCallThrowsRuntimeException_ShouldReturnRateFromFile() {
-        // Arrange
         String currency = "EUR";
         Double expectedRate = 0.90;
         Map<Object, Object> fileRates = new HashMap<>();
@@ -222,10 +220,10 @@ class RestCurrencyRateClientTest {
                 .thenThrow(new RuntimeException("Connection refused"));
         when(exchangeRateProvider.getExchangeRate()).thenReturn(fileRates);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.valueOf(expectedRate), result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verify(exchangeRateProvider).getExchangeRate();
@@ -233,7 +231,7 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRateFromService_WhenServiceCallThrowsRuntimeException_ShouldThrowException() {
-        // Arrange
+
         String currency = "EUR";
         Map<Object, Object> fileRates = new HashMap<>();
         fileRates.put(currency, 0.91);
@@ -243,10 +241,10 @@ class RestCurrencyRateClientTest {
                 .thenThrow(new RuntimeException("Connection refused"));
         when(exchangeRateProvider.getExchangeRate()).thenReturn(fileRates);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.valueOf(0.91), result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verify(exchangeRateProvider).getExchangeRate();
@@ -254,17 +252,17 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenServiceReturnsNullBody_ShouldReturnDefaultRate() {
-        // Arrange
+
         String currency = "EUR";
         ResponseEntity<Map> responseEntity = new ResponseEntity<>(null, HttpStatus.OK);
 
         when(sessionCurrency.getCurrency()).thenReturn(currency);
         when(restTemplate.getForEntity(currencyServiceUrl, Map.class)).thenReturn(responseEntity);
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.ONE, result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verifyNoInteractions(exchangeRateProvider); // Не должно вызывать fallback на файл
@@ -272,15 +270,15 @@ class RestCurrencyRateClientTest {
 
     @Test
     void getRate_WhenFileIsEmpty_ShouldReturnDefaultRate() {
-        // Arrange
+
         when(restTemplate.getForEntity(currencyServiceUrl, Map.class))
                 .thenThrow(new RestClientException("Service unavailable"));
         when(exchangeRateProvider.getExchangeRate()).thenReturn(new HashMap<>());
 
-        // Act
+
         BigDecimal result = currencyRateClient.getRate();
 
-        // Assert
+
         assertEquals(BigDecimal.ONE, result);
         verify(restTemplate).getForEntity(currencyServiceUrl, Map.class);
         verify(exchangeRateProvider).getExchangeRate();

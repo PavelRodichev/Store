@@ -55,7 +55,6 @@ public class AdminProductController {
     })
     public ResponseEntity<ProductResponseDto> createProduct(
             @RequestBody @Valid ProductCreateDto productDto) {
-        System.out.println();
         var product = productService.saveProduct(productDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }

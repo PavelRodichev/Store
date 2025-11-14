@@ -94,13 +94,13 @@ class ProductRepositoryTest {
 
     @Test
     void findAll_WithPageable_ShouldReturnPagedProducts() {
-        // Arrange
+
         Pageable pageable = PageRequest.of(0, 10);
 
-        // Act
+
         Page<Product> result = productRepository.findAll(pageable);
 
-        // Assert
+
         assertNotNull(result);
         assertEquals(3, result.getTotalElements());
         assertEquals(1, result.getTotalPages());
@@ -109,10 +109,10 @@ class ProductRepositoryTest {
 
     @Test
     void findById_WithExistingId_ShouldReturnProduct() {
-        // Act
+
         Optional<Product> result = productRepository.findById(laptop.getId());
 
-        // Assert
+
         assertTrue(result.isPresent());
         assertEquals("Laptop", result.get().getName());
         assertEquals("Electronics", result.get().getCategory().getName());
@@ -120,35 +120,35 @@ class ProductRepositoryTest {
 
     @Test
     void findById_WithNonExistingId_ShouldReturnEmpty() {
-        // Act
+
         Optional<Product> result = productRepository.findById(999L);
 
-        // Assert
+
         assertFalse(result.isPresent());
     }
 
     @Test
     void findByName_WithExistingName_ShouldReturnProduct() {
-        // Act
+
         Optional<Product> result = productRepository.findByName("Laptop");
 
-        // Assert
+
         assertTrue(result.isPresent());
         assertEquals(laptop.getId(), result.get().getId());
     }
 
     @Test
     void findByName_WithNonExistingName_ShouldReturnEmpty() {
-        // Act
+
         Optional<Product> result = productRepository.findByName("NonExistingProduct");
 
-        // Assert
+
         assertFalse(result.isPresent());
     }
     
     @Test
     void updateAllPrices_ShouldUpdateAllProductPrices() {
-        // Arrange
+
         BigDecimal multiplier = new BigDecimal("1.1"); // 10% increase
         BigDecimal initialLaptopPrice = laptop.getPrice();
         BigDecimal initialSmartphonePrice = smartphone.getPrice();
@@ -159,12 +159,12 @@ class ProductRepositoryTest {
         BigDecimal expectedSmartphonePrice = initialSmartphonePrice.multiply(multiplier)
                 .setScale(2, BigDecimal.ROUND_HALF_UP);
 
-        // Act
+
         productRepository.updateAllPrices(multiplier);
         entityManager.flush();
         entityManager.clear();
 
-        // Assert
+
         Product updatedLaptop = entityManager.find(Product.class, laptop.getId());
         Product updatedSmartphone = entityManager.find(Product.class, smartphone.getId());
 
@@ -178,13 +178,13 @@ class ProductRepositoryTest {
 
     @Test
     void findByCategoryName_ShouldReturnProductsByCategory() {
-        // Arrange
+
         Pageable pageable = PageRequest.of(0, 10);
 
-        // Act
+
         Page<Product> result = productRepository.findByCategoryName("Electronics", pageable);
 
-        // Assert
+
         assertNotNull(result);
         assertEquals(2, result.getTotalElements());
         assertTrue(result.getContent().stream()
@@ -193,13 +193,13 @@ class ProductRepositoryTest {
 
     @Test
     void findByCategoryName_WithNonExistingCategory_ShouldReturnEmptyPage() {
-        // Arrange
+
         Pageable pageable = PageRequest.of(0, 10);
 
-        // Act
+
         Page<Product> result = productRepository.findByCategoryName("NonExisting", pageable);
 
-        // Assert
+
         assertNotNull(result);
         assertEquals(0, result.getTotalElements());
     }
@@ -207,46 +207,45 @@ class ProductRepositoryTest {
 
     @Test
     void findAllForUpdate_ShouldReturnAllProducts() {
-        // Act
+
         List<Product> result = productRepository.findAllForUpdate();
 
-        // Assert
+
         assertNotNull(result);
         assertEquals(3, result.size());
     }
 
     @Test
     void findByIdForUpdate_WithExistingId_ShouldReturnProduct() {
-        // Act
+
         Optional<Product> result = productRepository.findByIdForUpdate(laptop.getId());
 
-        // Assert
+
         assertTrue(result.isPresent());
         assertEquals("Laptop", result.get().getName());
     }
 
     @Test
     void findByIdForUpdate_WithNonExistingId_ShouldReturnEmpty() {
-        // Act
+
         Optional<Product> result = productRepository.findByIdForUpdate(999L);
 
-        // Assert
+
         assertFalse(result.isPresent());
     }
 
     @Test
     void findAll_WithSpecification_ShouldReturnFilteredProducts() {
-        // Arrange
+
         Pageable pageable = PageRequest.of(0, 10);
 
-        // Спецификация для поиска продуктов дороже 500
+
         Specification<Product> priceSpecification = (root, query, criteriaBuilder) ->
                 criteriaBuilder.greaterThan(root.get("price"), new BigDecimal("500"));
 
-        // Act
         Page<Product> result = productRepository.findAll(priceSpecification, pageable);
 
-        // Assert
+
         assertNotNull(result);
         assertEquals(2, result.getTotalElements()); // Laptop и Smartphone
         assertTrue(result.getContent().stream()
@@ -255,17 +254,17 @@ class ProductRepositoryTest {
 
     @Test
     void findAll_WithCategorySpecification_ShouldReturnFilteredProducts() {
-        // Arrange
+
         Pageable pageable = PageRequest.of(0, 10);
 
-        // Спецификация для поиска продуктов в категории Electronics
+
         Specification<Product> categorySpecification = (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("category").get("name"), "Electronics");
 
-        // Act
+
         Page<Product> result = productRepository.findAll(categorySpecification, pageable);
 
-        // Assert
+
         assertNotNull(result);
         assertEquals(2, result.getTotalElements());
         assertTrue(result.getContent().stream()
@@ -274,7 +273,7 @@ class ProductRepositoryTest {
 
     @Test
     void save_NewProduct_ShouldPersistProduct() {
-        // Arrange
+
         Product newProduct = Product.builder()
                 .name("Tablet")
                 .article("TAB001")
@@ -285,12 +284,11 @@ class ProductRepositoryTest {
                 .category(electronics)
                 .build();
 
-        // Act
+
         Product savedProduct = productRepository.save(newProduct);
         entityManager.flush();
         entityManager.clear();
 
-        // Assert
         assertNotNull(savedProduct.getId());
         Product retrievedProduct = entityManager.find(Product.class, savedProduct.getId());
         assertEquals("Tablet", retrievedProduct.getName());
@@ -299,22 +297,22 @@ class ProductRepositoryTest {
 
     @Test
     void delete_ExistingProduct_ShouldRemoveProduct() {
-        // Act
+
         productRepository.delete(laptop);
         entityManager.flush();
         entityManager.clear();
 
-        // Assert
+
         Product deletedProduct = entityManager.find(Product.class, laptop.getId());
         assertNull(deletedProduct);
     }
 
     @Test
     void count_ShouldReturnTotalNumberOfProducts() {
-        // Act
+
         long count = productRepository.count();
 
-        // Assert
+
         assertEquals(3, count);
     }
 }

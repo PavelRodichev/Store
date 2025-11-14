@@ -34,12 +34,14 @@ public class Order {
     BigDecimal totalAmount = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
+    @Builder.Default // при использовании билдера значение по умолчанию не игнорируется!
     List<OrderItem> items = new ArrayList<>();
 
+    @Column(nullable = false)
     String address;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     OrderStatus orderStatus;
 
     @CreatedDate

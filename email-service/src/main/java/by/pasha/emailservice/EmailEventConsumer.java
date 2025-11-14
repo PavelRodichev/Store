@@ -15,7 +15,7 @@ public class EmailEventConsumer {
     private final ObjectMapper objectMapper;
 
 
-    @KafkaListener(topics = "email-topic")
+    @KafkaListener(topics = "${app.kafka.topics.user-registered:user-registered-topic}")
     public void consumeUserRegisteredEvent(String message) {
         log.info("consumer email give message for topic: {}", message);
         try {

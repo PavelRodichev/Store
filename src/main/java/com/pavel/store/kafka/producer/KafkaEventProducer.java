@@ -22,7 +22,7 @@ public class KafkaEventProducer {
         try {
             log.info("Working Kafka Producer...");
 
-            kafkaTemplate.send("email-topic", emailMessage.getId(), emailMessage);
+            kafkaTemplate.send("user-registered-topic", emailMessage.getId(), emailMessage);
 
             log.info("message send to topic");
         } catch (Exception e) {
