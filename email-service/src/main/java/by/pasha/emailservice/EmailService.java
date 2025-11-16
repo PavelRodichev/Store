@@ -26,7 +26,8 @@ public class EmailService {
     // Отправка HTML писем с Thymeleaf
     public void sendHtmlEmail(String to, String subject, String templateName,
                               Map<String, Object> variables) {
-
+        log.info("🔄 Processing email: To={}, Subject={}, Template={}, VariablesCount={}",
+                to, subject, templateName, variables != null ? variables.size() : 0);
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

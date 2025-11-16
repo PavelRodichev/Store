@@ -9,21 +9,17 @@ spring:
     consumer:
       group-id: "${KAFKA_CONSUMER_GROUP:email-service-group}"
       auto-offset-reset: earliest
-      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer  # ← ИЗМЕНИТЬ
       properties:
-        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
-        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        # УБРАТЬ ErrorHandlingDeserializer настройки
         spring.json.trusted.packages: "*"
-        spring.json.use.type.headers: false
-        spring.json.value.default.type: java.lang.String
-
 
   mail:
     host: "${SMTP_HOST:smtp.gmail.com}"
     port: "${SMTP_PORT:587}"
-    username: "${SMTP_USERNAME:}"
-    password: "${SMTP_PASSWORD:}"
+    username: "${SMTP_USERNAME:test@gmail.com}"
+    password: "${SMTP_PASSWORD:eqfx hplv ctat thnx}"
     properties:
       mail:
         smtp:

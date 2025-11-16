@@ -1,10 +1,14 @@
 package by.pasha.emailservice;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -14,31 +18,59 @@ public class EmailEventConsumer {
     private final EmailService emailService;
     private final ObjectMapper objectMapper;
 
-
     @KafkaListener(topics = "${app.kafka.topics.user-registered:user-registered-topic}")
     public void consumeUserRegisteredEvent(String message) {
-        log.info("consumer email give message for topic: {}", message);
+        log.info("📨 Received raw message from Kafka: {}", message);
+
         try {
-            EmailMessage emailMessage = objectMapper.readValue(message, EmailMessage.class);
+            // Парсим JSON в общую структуру
+            JsonNode jsonNode = objectMapper.readTree(message);
+
+            // Извлекаем поля ТОЧНО как в вашем EmailMessage
+            String to = extractField(jsonNode, "to");
+            String subject = extractField(jsonNode, "subject");
+            String templateName = extractField(jsonNode, "templateName");
+
+            // Парсим variables
+            Map<String, Object> variables = extractVariables(jsonNode);
 
             log.info("""
-                            ✅ Successfully parsed EmailMessage:
-                            ID: {}
-                            To: {}
-                            Subject: {}
-                            Template: {}
-                            Variables: {}
-                            """, emailMessage.getId(), emailMessage.getTo(),
-                    emailMessage.getSubject(), emailMessage.getTemplateName(),
-                    emailMessage.getVariables());
+                    ✅ Successfully parsed email data:
+                    To: {}
+                    Subject: {}
+                    Template: {}
+                    Variables: {}
+                    """, to, subject, templateName, variables);
 
-            emailService.sendHtmlEmail(emailMessage.getTo(), emailMessage.getSubject(),
-                    emailMessage.getTemplateName(), emailMessage.getVariables());
-            log.info("message input in sendHtmlEmail() method");
+            // Отправляем email
+            emailService.sendHtmlEmail(to, subject, templateName, variables);
+            log.info("✉️ Email sent successfully to: {}", to);
+
         } catch (Exception e) {
-            log.error("❌ Failed to send welcome email to: {}", e.getMessage());
+            log.error("❌ Failed to process email message. Error: {}", e.getMessage(), e);
+            log.error("Raw message that failed: {}", message);
         }
     }
 
+    private String extractField(JsonNode jsonNode, String fieldName) {
+        if (jsonNode.has(fieldName) && !jsonNode.get(fieldName).isNull()) {
+            return jsonNode.get(fieldName).asText();
+        }
+        log.warn("⚠️ Field '{}' not found or is null", fieldName);
+        return "";
+    }
 
+    private Map<String, Object> extractVariables(JsonNode jsonNode) {
+        try {
+            if (jsonNode.has("variables") && jsonNode.get("variables").isObject()) {
+                return objectMapper.convertValue(
+                        jsonNode.get("variables"),
+                        new TypeReference<Map<String, Object>>() {}
+                );
+            }
+        } catch (Exception e) {
+            log.warn("⚠️ Could not parse variables: {}", e.getMessage());
+        }
+        return Map.of("firstName", "User", "lastName", ""); // значения по умолчанию
+    }
 }

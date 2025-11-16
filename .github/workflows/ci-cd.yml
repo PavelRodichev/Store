@@ -2,7 +2,7 @@ name: CI/CD for Internet Shop
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [currency-service, email-service, inn-service]
+        service: [ currency-service, email-service, inn-service ]
 
     steps:
       - uses: actions/checkout@v4
@@ -99,7 +99,7 @@ jobs:
           mvn clean test -B
 
   build-and-push:
-    needs: [test-main-service, test-microservices]
+    needs: [ test-main-service, test-microservices ]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
