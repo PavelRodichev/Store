@@ -19,6 +19,7 @@ import com.pavel.store.repository.ProductRepository;
 import com.pavel.store.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,8 @@ public class OrderService {
     private final ProductMapper productMapper;
     private final IdempotencyService idempotencyService;
 
+    @Value(value = "${inn.service.url}")
+    private String INN_URL;
 
     @Transactional
     public List<ProductWithOrdersResponse> getGroupingProductsByOrder() {
@@ -69,7 +72,7 @@ public class OrderService {
         }
 
         try {
-            ResponseEntity response = restTemplate.postForEntity("http://localhost:8082/api/inn", email, Map.class);
+            ResponseEntity response = restTemplate.postForEntity(INN_URL, email, Map.class);
             Map<String, String> mapEmails;
             if (response.getStatusCode().is2xxSuccessful()) {
                 mapEmails = (Map<String, String>) response.getBody();
