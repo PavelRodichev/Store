@@ -5,6 +5,7 @@
 ![Docker](https://img.shields.io/badge/Docker-ready-blue)
 ![Microservices](https://img.shields.io/badge/Architecture-Microservices-orange)
 ![Kafka](https://img.shields.io/badge/Kafka-231F20?style=flat-square&logo=apache-kafka&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=flat-square&logo=redis&logoColor=white)
 
 |Многопользовательский Интернет-магазин с микросервисной архитектурой
 # Обзор проекта
