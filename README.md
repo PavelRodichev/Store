@@ -174,7 +174,7 @@ store/
 ## 👨‍💻 Автор
 
 **Pavel Rodcihev**
-- GitHub: [@IsaIsmailzade](https://github.com/PavelRodichev)
+- GitHub: [@Rodichev](https://github.com/PavelRodichev)
 - Telegram: []()
 
 ---
