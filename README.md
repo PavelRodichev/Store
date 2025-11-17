@@ -23,7 +23,7 @@
 - **CRUD операции** - различные CRUD оперции с товарами,заказами,пользователями,категориями и т.д
 - **Работа с кэшем** - сохранения валюты в кеш и ключа идемпотетности, (redis,caffeine,session)
 -  **Глобальный обработчик исключений** - GlobalExceptionHandler и кастомные исключения
--  **Обработчики событий** - EvenHandlers и EventSource для каждого event (USER_REGISTERED,COMPLETED_ORDER,CANCELLED_ORDER,CHANGE_ADDRESS,CREATE_ORDER)
+-  **Обработчики событий(Event-driven с Kafka)** - EvenHandlers и EventSource для каждого event (USER_REGISTERED,COMPLETED_ORDER,CANCELLED_ORDER,CHANGE_ADDRESS,CREATE_ORDER)
 -  **Заглушка для клиентского сервиса валюты** - Stub для вызываемого сервиса CurrencyRateClient(CurrencyRateClientStub)
 -  **Spring AOP** - Анотация которая измеряет время выполнения метода с помощью AOP
 -  **Фильтры для запросов** - OncePerRequestFilter и JwtAuthenticationFilter
