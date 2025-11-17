@@ -173,9 +173,9 @@ store/
 
 ## 👨‍💻 Автор
 
-**Isa Ismailzade**
-- GitHub: [@IsaIsmailzade](https://github.com/IsaIsmailzade)
-- Telegram: [@isa_ismailzade](https://t.me/isa_ismailzade)
+**Pavel Rodcihev**
+- GitHub: [@IsaIsmailzade](https://github.com/PavelRodichev)
+- Telegram: []()
 
 ---
 
