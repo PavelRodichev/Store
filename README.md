@@ -42,7 +42,7 @@
 ### Технологический стек
 - **Backend:** Java 17, Spring Boot 3.0, Spring Data JPA, Spring Security, Spring Web, Spring for Apache Kafka
 - **Базы данных:** PostgreSQL, H2 (для тестов), Redis, Liquibase
-- **Микросервисы:** Spring mail, RestTemplate
+- **Микросервисы:** Spring mail, RestTemplate, KafkaTemplate
 - **Мессенджер:** Apache Kafka
 - **Кэширование:** Caffeine, Redis
 - **Тестирование:** JUnit 5, Mockito, RestAssured
