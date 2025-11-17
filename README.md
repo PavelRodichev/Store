@@ -25,6 +25,8 @@
 -  **Глобальный обработчик исключений** - GlobalExceptionHandler и кастомные исключения
 -  **Обработчики событий** - EvenHandlers и EventSource для каждого event (USER_REGISTERED,COMPLETED_ORDER,CANCELLED_ORDER,CHANGE_ADDRESS,CREATE_ORDER)
 -  **Заглушка для клиентского сервиса валюты** - Stub для вызываемого сервиса CurrencyRateClient(CurrencyRateClientStub)
+-  **Spring AOP** - Анотация которая измеряет время выполнения метода с помощью AOP
+-  **Фильтры для запросов** - OncePerRequestFilter и JwtAuthenticationFilter
   
  ## 🖧 Микросервисы
 - **💲Currency Service** - конвертация валют (USD, EUR, RUB)
