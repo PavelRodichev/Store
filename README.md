@@ -168,6 +168,7 @@ store/
 ├── src/                        # Основной REST API сервис
 ├── currency-service/           # Сервис для конвертации валют
 ├── email-service/              # Сервис для оправки email
+├── inn-service/                # Сервис для доступа к инн юзера по email
 ├── docker-compose.yaml         # Конфигурация контейнеров
 └── README.md
 ```
