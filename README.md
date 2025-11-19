@@ -56,7 +56,7 @@
 - **Кэширование:** Caffeine, Redis
 - **Тестирование:** JUnit 5, Mockito, RestAssured
 - **Контейнеризация:** Docker, Docker Compose
-- **Дополнительно:** AOP, Transactions, Scheduling,Swagger (OpenAPI), CI/CD, GitHub Actions
+- **Дополнительно:** AOP, Transactions, Scheduling,Swagger (OpenAPI), CI/CD, GitHub Actions, Hibernate
 - **Системы сборки:** Maven
 ## 💻⚙️Инструкция по запуску проекта на локальном компьютере
 Предварительные требования:
